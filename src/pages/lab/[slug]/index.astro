@@ -1,0 +1,38 @@
+---
+import Base from "~/layouts/Base.astro";
+import ArticlePage from "~/components/ArticlePage.astro";
+import { ARTICLES } from "~/lib/content";
+import { absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb, article as articleSchema, faqPage } from "~/lib/schema";
+
+export function getStaticPaths() {
+  return ARTICLES.map((a) => ({ params: { slug: a.slug }, props: { article: a } }));
+}
+
+const locale = "fr" as const;
+const { article } = Astro.props;
+const link = (p: string) => localizedPath(locale, p);
+const url = absoluteUrl(link(`/lab/${article.slug}/`));
+
+const title = article.meta.title[locale];
+const description = article.meta.description[locale];
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/") },
+    { name: "Lab", url: absoluteUrl(link("/lab/")) },
+    { name: article.title[locale], url },
+  ]),
+  articleSchema({
+    url,
+    title: article.title[locale],
+    description: article.lead[locale],
+    datePublished: article.publishedAt,
+    locale,
+  }),
+  ...(article.faq && article.faq[locale].length > 0 ? [faqPage(article.faq[locale])] : []),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema} bodyClass="press-light">
+  <ArticlePage locale={locale} article={article} />
+</Base>

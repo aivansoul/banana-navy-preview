@@ -1,0 +1,54 @@
+---
+import Base from "~/layouts/Base.astro";
+import { SITE, absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb } from "~/lib/schema";
+import { t } from "~/lib/i18n";
+
+const locale = "nl" as const;
+const i = t(locale);
+
+const title = "Privacybeleid (GDPR) · Banana Navy";
+const description =
+  "Hoe Banana Navy persoonsgegevens verzamelt, gebruikt en beschermt — conform de GDPR. Je rechten, onze engagementen, onze subverwerkers.";
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/nl/") },
+    { name: "Privacy", url: absoluteUrl(localizedPath(locale, i.routes.privacy)) },
+  ]),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <section class="section">
+    <div class="container" style="max-width: 760px;">
+      <div class="eyebrow mono"><span class="dot"></span>Juridisch · GDPR</div>
+      <h1 class="display h1" style="margin-top: 24px;">Privacybeleid</h1>
+      <div class="legal-body">
+        <p>Deze pagina beschrijft hoe {SITE.legalName} persoonsgegevens verzamelt, gebruikt en beschermt die je ons via deze site toevertrouwt.</p>
+
+        <h2>Verwerkingsverantwoordelijke</h2>
+        <p>{SITE.legalName} — {SITE.address.street}, {SITE.address.postalCode} {SITE.address.city}, België. GDPR-contact: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.</p>
+
+        <h2>Verzamelde gegevens</h2>
+        <p>Contactformulier: naam, email, onderneming, bericht. Er worden geen gegevens passief verzameld (geen advertentie-tracking).</p>
+
+        <h2>Doeleinden</h2>
+        <p>Contact opnemen, je vraag kwalificeren, de gratis audit inplannen. Geen marketinggebruik zonder afzonderlijke toestemming.</p>
+
+        <h2>Bewaartermijn</h2>
+        <p>Gegevens worden 24 maanden bewaard na het laatste contact, tenzij eerdere verwijdering gevraagd wordt.</p>
+
+        <h2>Je rechten</h2>
+        <p>Je hebt recht op inzage, rechtzetting, wissing, bezwaar en overdraagbaarheid. Uitoefenen via <a href={`mailto:${SITE.email}`}>{SITE.email}</a>. Je kan ook klacht indienen bij de <a href="https://www.gegevensbeschermingsautoriteit.be/" rel="noopener">Gegevensbeschermingsautoriteit</a> (België).</p>
+
+        <h2>Subverwerkers</h2>
+        <p>Hosting: Cloudflare (USA, transfer geregeld via SCC's). Transactionele email: te bepalen in Fase 4.</p>
+      </div>
+    </div>
+  </section>
+  <style>
+    .legal-body { margin-top: 40px; display: grid; gap: 20px; color: var(--fg-60); font-size: 15px; line-height: 1.65; }
+    .legal-body h2 { color: var(--fg); font-family: var(--font-display); font-weight: 500; font-size: 22px; margin-top: 16px; letter-spacing: -0.01em; }
+    .legal-body a { color: var(--accent); }
+  </style>
+</Base>

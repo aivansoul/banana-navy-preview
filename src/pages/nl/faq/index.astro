@@ -1,0 +1,47 @@
+---
+import Base from "~/layouts/Base.astro";
+import { FAQ } from "~/lib/content";
+import { absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb, faqPage } from "~/lib/schema";
+import { t } from "~/lib/i18n";
+
+const locale = "nl" as const;
+const i = t(locale);
+
+const title = "FAQ — Hallucinaties, open-source, modulariteit · Banana Navy";
+const description =
+  "De vragen die we echt krijgen, geschreven om geciteerd te worden door ChatGPT, Claude, Perplexity en Google. Korte, feitelijke en verifieerbare antwoorden.";
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/nl/") },
+    { name: "FAQ", url: absoluteUrl(localizedPath(locale, i.routes.faq)) },
+  ]),
+  faqPage(FAQ.nl),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>FAQ — {FAQ.nl.length} vragen</div>
+          <h1 class="display h1" style="margin-top: 24px;">Wat mensen<br />aan ChatGPT vragen.</h1>
+          <p class="faq-schema" style="margin-top: 12px;">FAQPage-schema actief · Geoptimaliseerd voor citatie door AI-zoekmachines in 2026</p>
+        </div>
+      </div>
+      <div class="faq-list" style="margin-top: 64px;">
+        {FAQ.nl.map((item, idx) => (
+          <details class="faq-item" open={idx === 0}>
+            <summary>
+              <span class="faq-num">{String(idx + 1).padStart(2, "0")}</span>
+              <span class="faq-q">{item.q}</span>
+              <span class="faq-toggle">+</span>
+            </summary>
+            <div class="faq-a">{item.a}</div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>

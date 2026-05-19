@@ -1,0 +1,66 @@
+---
+import Base from "~/layouts/Base.astro";
+import { TEAM_AGENTS_META } from "~/lib/agents-meta";
+import { localizedPath } from "~/lib/site";
+
+const locale = "fr" as const;
+const link = (p: string) => localizedPath(locale, p);
+
+const title = "Team Agents — Banana Navy (interne)";
+const description = "Espace interne. Dispatch les 5 chiefs Banana Navy depuis le browser. Authentification requise.";
+---
+<Base locale={locale} title={title} description={description} noindex={true}>
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Team · interne · {TEAM_AGENTS_META.length} chiefs</div>
+          <h1 class="display h1" style="margin-top: 24px;">Brief un chief.</h1>
+          <p class="body-l" style="color: var(--fg-60); max-width: 60ch; margin-top: 28px;">
+            Mêmes charters que <code>.claude/agents/*.md</code>. Modèle : Claude Sonnet 4.6.
+            Contrat de brief : <strong>GOAL / CONTEXT / CONSTRAINTS / DEFINITION OF DONE</strong>.
+          </p>
+        </div>
+      </div>
+
+      <div class="team-grid">
+        {TEAM_AGENTS_META.map((a) => (
+          <a href={link(`/team/${a.slug}/`)} class="team-card">
+            <span class="team-name">{a.name}</span>
+            <span class="team-tag">{a.tagline}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .team-grid {
+      margin-top: 64px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 700px) { .team-grid { grid-template-columns: 1fr; } }
+    .team-card {
+      display: grid;
+      gap: 10px;
+      padding: 24px;
+      border: 1px solid var(--fg-10);
+      background: rgba(255, 255, 255, 0.02);
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+    .team-card:hover {
+      border-color: var(--accent);
+      background: rgba(255, 215, 56, 0.04);
+    }
+    .team-name {
+      font-family: var(--font-display);
+      font-size: 28px;
+      color: var(--fg);
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+    }
+    .team-tag { color: var(--fg-60); font-size: 13px; line-height: 1.55; }
+  </style>
+</Base>

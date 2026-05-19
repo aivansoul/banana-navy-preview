@@ -1,0 +1,351 @@
+---
+import Base from "~/layouts/Base.astro";
+import Hero from "~/components/Hero.astro";
+import TrustBar from "~/components/TrustBar.astro";
+import { faqPage, breadcrumb, service } from "~/lib/schema";
+import {
+  TRUST_CLIENTS,
+  SERVICE_CATEGORIES,
+  PILLARS_3,
+  LAYERS_5,
+  POSITIONING,
+  METHOD_STEPS,
+  FAQ,
+  CASE_PREVIEWS,
+  PILLARS,
+  ALL_LEAVES,
+} from "~/lib/content";
+import { absoluteUrl, localizedPath } from "~/lib/site";
+import { t } from "~/lib/i18n";
+
+const locale = "nl" as const;
+const i = t(locale);
+const r = i.routes;
+const link = (p: string) => localizedPath(locale, p);
+
+const title = "Banana Navy — Agent-systemen voor automatisering · Charleroi";
+const description = POSITIONING.nl;
+
+const schema = [
+  faqPage(FAQ.nl),
+  breadcrumb([{ name: "Banana Navy", url: absoluteUrl("/nl/") }]),
+  ...ALL_LEAVES.map((leaf) =>
+    service({
+      name: leaf.name[locale],
+      description: leaf.claim[locale],
+      url: absoluteUrl(link(`/${leaf.categorySlug}/${leaf.slug}/`)),
+      category: SERVICE_CATEGORIES.find((c) => c.slug === leaf.categorySlug)!.head,
+    }),
+  ),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema} bodyClass="press-light">
+  <Hero
+    intro={POSITIONING.nl}
+    titleLines={["Installeer AI.", "Hou de controle."]}
+    accentWord="controle"
+    ctaPrimary={{ label: "Gratis AI-audit →", href: link(r.contact) }}
+    ctaSecondary={{ label: "Bekijk diensten →", href: "#services" }}
+  />
+
+  <TrustBar label="Zij vertrouwden ons" clients={[...TRUST_CLIENTS]} />
+
+  <section class="section" id="problem">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow mono"><span class="dot"></span>Het probleem — 03</div>
+        <h2 class="display h2">
+          Je weet dat je AI nodig hebt.<br />
+          <span style="color: var(--fg-60);">Je weet niet waar te beginnen.</span>
+        </h2>
+      </div>
+      <div class="problem-grid">
+        <article class="problem-card">
+          <div class="problem-num">01 — Groei</div>
+          <h3 class="problem-title">Je werft aan om de groei te beheren.</h3>
+          <p class="problem-body">Elke nieuwe klant = nieuwe processen, nieuwe pijn. Je stapelt vaste contracten op terwijl 60% van het werk automatiseerbaar is.</p>
+        </article>
+        <article class="problem-card">
+          <div class="problem-num">02 — Onzichtbaar</div>
+          <h3 class="problem-title">Je concurrenten worden al door ChatGPT aanbevolen.</h3>
+          <p class="problem-body">Je prospects stellen hun vragen aan AI, en jouw site komt nergens voor. Je wordt onzichtbaar zonder het te weten.</p>
+        </article>
+        <article class="problem-card">
+          <div class="problem-num">03 — Dode POC</div>
+          <h3 class="problem-title">Je investeerde in AI. Niets draait.</h3>
+          <p class="problem-body">Een POC die ergens slaapt. Een chatbot die niemand gebruikt. Je betaalde voor de belofte, niet voor het resultaat.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="pillars">
+    <div class="container">
+      <div class="levers-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>3 pijlers — Agents · Create · Automate</div>
+          <h2 class="display h2" style="margin-top: 24px;">Drie pijlers.<br />Eén systeem.</h2>
+        </div>
+        <p class="body-l" style="color: var(--fg-60); max-width: 480px;">
+          We ontwerpen <strong>modulaire agent-systemen</strong> die communicatie, operations, leadgeneratie en digitale groei automatiseren. Drie pijlers, vijf lagen, één logica: we bouwen zo dat snelle tech-shifts je business niet breken — uitwisselbare modules, geen obsolescentie na 12 maanden.
+        </p>
+      </div>
+
+      <div class="pillars-3">
+        {PILLARS_3.map((p) => (
+          <article class="pillar-3">
+            <div class="pillar-3-head">
+              <span class="pillar-3-key">{p.title.nl}</span>
+            </div>
+            <p class="pillar-3-tagline">{p.tagline.nl}</p>
+            <div class="pillar-3-cats">
+              {p.categories.map((slug) => {
+                const cat = SERVICE_CATEGORIES.find((c) => c.slug === slug)!;
+                return (
+                  <a href={link(`/${cat.slug}/`)} class="pillar-3-cat-link">
+                    {cat.head} →
+                  </a>
+                );
+              })}
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="layers">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Architectuur — 5 lagen</div>
+          <h2 class="display h2" style="margin-top: 24px;">
+            Vijf lagen.<br /><span style="color: var(--fg-60);">Eén orkestratie.</span>
+          </h2>
+        </div>
+        <p class="body-l" style="color: var(--fg-60); max-width: 480px;">
+          Communicatie, operations, discovery, interface — en daarboven de agent-systemen die de andere vier orkestreren als een dirigent.
+        </p>
+      </div>
+
+      <div class="layers-stack">
+        {LAYERS_5.map((layer) => {
+          const cat = SERVICE_CATEGORIES.find((c) => c.slug === layer.bridgeTo)!;
+          return (
+            <a href={link(`/${cat.slug}/`)} class:list={["layer-row", layer.keystone && "is-keystone"]}>
+              <span class="layer-num">{layer.num}</span>
+              <span class="layer-name">{layer.name.nl}</span>
+              <span class="layer-desc">{layer.desc.nl}</span>
+              <span class="layer-arrow">→</span>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="services">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Diensten — 05 categorieën · 13 diensten</div>
+          <h2 class="display h2" style="margin-top: 24px;">Wat we voor jou bouwen.</h2>
+        </div>
+      </div>
+      <div class="cap-grid">
+        {SERVICE_CATEGORIES.map((cat) => (
+          <article class="cap-card">
+            <div class="cap-head">
+              <span class="cap-pillar">{cat.head}</span>
+              <span class="cap-pillar-tag">{cat.pillar}</span>
+            </div>
+            <p class="cap-one">{cat.one_liner.nl}</p>
+            <ul class="cap-leaves">
+              {cat.leaves.map((leaf) => (
+                <li>
+                  <a href={link(`/${cat.slug}/${leaf.slug}/`)}>{leaf.name.nl}</a>
+                </li>
+              ))}
+            </ul>
+            <a href={link(`/${cat.slug}/`)} class="cap-cta">
+              Ontdek {cat.head} →
+            </a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="method">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Onze methode — 04 stappen</div>
+          <h2 class="display h2" style="margin-top: 24px;">4 stappen.<br />Geen grijze zones.</h2>
+        </div>
+        <p class="body-l" style="color: var(--fg-60); max-width: 360px;">
+          De laatste stap is degene die anderen vergeten. Die is van ons.
+        </p>
+      </div>
+      <div class="method-timeline">
+        <div class="method-line" aria-hidden="true"></div>
+        {METHOD_STEPS.map((step) => (
+          <div class:list={["method-step", step.signature && "is-signature"]}>
+            <div class="method-node">{step.num}</div>
+            <h4 class="method-name">{step.name.nl}</h4>
+            <p class="method-body">{step.body.nl}</p>
+            {step.signature && <span class="method-sig">Onze handtekening</span>}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--light" id="results">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Voor / Na — 03 realisaties</div>
+          <h2 class="display h2" style="margin-top: 24px;">
+            De resultaten spreken.<br /><span class="h-accent">Zie het zelf.</span>
+          </h2>
+        </div>
+      </div>
+      <div class="results-grid">
+        {CASE_PREVIEWS.map((c) => (
+          <article class="case">
+            <div class="case-video">
+              <div class="case-play" aria-hidden="true">▶</div>
+            </div>
+            <div class="case-label">{c.client} · {c.industry.nl}</div>
+            <div class="case-rows">
+              <div class="case-row">
+                <span class="case-row-tag">Voor</span>
+                <span class="case-row-text" style="color: rgba(10,10,10,0.55);">{c.before.nl}</span>
+              </div>
+              <div class="case-arrow">↓</div>
+              <div class="case-row after">
+                <span class="case-row-tag">Na</span>
+                <span class="case-row-text">{c.after.nl}</span>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+      <div class="results-foot">
+        <a href={link(r.realisations)}>Alle realisaties bekijken →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="trust-layer">
+    <div class="container">
+      <div class="trust-layer-grid">
+        <div class="trust-layer-copy">
+          <div class="eyebrow mono"><span class="dot"></span>Trust Layer — 03 pijlers</div>
+          <h2 class="display h2 trust-h2">
+            Geen black box.<br /><span style="color: var(--fg-60);">Je data blijft van jou.</span>
+          </h2>
+          <p>
+            We kiezen waar mogelijk voor open-source modellen. We documenteren elke guardrail. We bouwen modulaire architecturen — komt er over 6 maanden een beter model, dan wisselen we de module, niet het systeem. En we tonen je precies waar je data passeert: elke prompt, elke call, elke log.
+          </p>
+          <a href={link(r.approche)}>Lees onze volledige aanpak →</a>
+        </div>
+        <div class="trust-venn">
+          {PILLARS.map((p, idx) => (
+            <div class:list={["venn-pillar", `venn-pillar-${idx}`]}>
+              <span class="venn-num">{p.num}</span>
+              <h4 class="venn-title">{p.title.nl}</h4>
+              <p class="venn-body">{p.body.nl}</p>
+            </div>
+          ))}
+          <svg class="venn-diagram" viewBox="0 0 400 320" aria-hidden="true">
+            <circle cx="140" cy="130" r="100" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="260" cy="130" r="100" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="200" cy="220" r="100" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>FAQ — {FAQ.nl.length} vragen</div>
+          <h2 class="display h2" style="margin-top: 24px;">Wat mensen<br />aan ChatGPT vragen.</h2>
+          <p class="faq-schema">FAQPage schema actief · Geoptimaliseerd voor citatie door AI-zoekmachines in 2026</p>
+        </div>
+      </div>
+      <div class="faq-list">
+        {FAQ.nl.map((item, idx) => (
+          <details class="faq-item">
+            <summary>
+              <span class="faq-num">{String(idx + 1).padStart(2, "0")}</span>
+              <span class="faq-q">{item.q}</span>
+              <span class="faq-toggle">+</span>
+            </summary>
+            <div class="faq-a">{item.a}</div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="final-cta" id="final-cta">
+    <div class="eyebrow mono" style="display:inline-flex;gap:12px;align-items:center;margin-bottom:32px;">
+      <span class="dot" style="width:6px;height:6px;background:var(--accent);display:inline-block;"></span>
+      Klaar om te starten?
+    </div>
+    <h2>Ontdek wat <span class="accent-word">AI</span> voor jou kan doen.</h2>
+    <p>Gratis · Vrijblijvend · Met een concreet eindrapport</p>
+    <div class="final-cta-actions">
+      <a href={link(r.contact)} class="btn-yellow">Boek mijn audit →</a>
+      <a href={link(r.realisations)} class="btn-line">Bekijk de realisaties →</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* Identical styles to the FR home — kept inline for component locality */
+  .pillars-3 { margin-top: 64px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  @media (max-width: 900px) { .pillars-3 { grid-template-columns: 1fr; } }
+  .pillar-3 { border: 1px solid var(--fg-10); padding: 36px 28px; background: rgba(255, 255, 255, 0.02); transition: border-color 0.2s ease, background 0.2s ease; }
+  .pillar-3:hover { border-color: var(--accent); }
+  .pillar-3-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 20px; }
+  .pillar-3-key { font-family: var(--font-display); font-size: 36px; font-weight: 600; letter-spacing: -0.02em; color: var(--accent); text-transform: uppercase; }
+  .pillar-3-tagline { color: var(--fg-60); font-size: 15px; line-height: 1.55; margin-bottom: 24px; }
+  .pillar-3-cats { display: flex; flex-direction: column; gap: 8px; }
+  .pillar-3-cat-link { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg); padding: 8px 0; border-bottom: 1px solid var(--fg-20); }
+  .pillar-3-cat-link:hover { color: var(--accent); border-color: var(--accent); }
+
+  .layers-stack { margin-top: 56px; display: grid; gap: 0; border-top: 1px solid var(--fg-10); }
+  .layer-row { display: grid; grid-template-columns: 60px 200px 1fr 40px; align-items: center; gap: 24px; padding: 24px 0; border-bottom: 1px solid var(--fg-10); color: var(--fg); transition: padding 0.25s ease, background 0.25s ease; }
+  .layer-row:hover { padding-left: 16px; background: rgba(255, 215, 56, 0.04); }
+  .layer-row.is-keystone { background: rgba(255, 215, 56, 0.06); border-left: 3px solid var(--accent); padding-left: 13px; }
+  .layer-num { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; color: var(--accent); }
+  .layer-name { font-family: var(--font-display); font-size: 24px; font-weight: 500; letter-spacing: -0.01em; text-transform: uppercase; }
+  .layer-desc { color: var(--fg-60); font-size: 14px; line-height: 1.55; }
+  .layer-arrow { text-align: right; color: var(--fg-40); }
+  .layer-row:hover .layer-arrow { color: var(--accent); }
+  @media (max-width: 700px) {
+    .layer-row { grid-template-columns: 50px 1fr; row-gap: 8px; }
+    .layer-desc { grid-column: 1 / -1; }
+    .layer-arrow { grid-column: 2; justify-self: end; }
+  }
+
+  .cap-grid { margin-top: 64px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  @media (max-width: 1100px) { .cap-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 700px) { .cap-grid { grid-template-columns: 1fr; } }
+  .cap-card { border: 1px solid var(--fg-10); padding: 28px; display: flex; flex-direction: column; background: rgba(255, 255, 255, 0.02); transition: border-color 0.2s ease; }
+  .cap-card:hover { border-color: var(--accent); }
+  .cap-head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--fg-10); padding-bottom: 16px; margin-bottom: 20px; }
+  .cap-pillar { font-family: var(--font-display); font-size: 22px; font-weight: 500; letter-spacing: -0.01em; text-transform: uppercase; }
+  .cap-pillar-tag { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); }
+  .cap-one { color: var(--fg-60); font-size: 14px; line-height: 1.55; margin-bottom: 20px; }
+  .cap-leaves { list-style: none; padding: 0; margin: 0 0 28px; display: grid; gap: 8px; flex: 1; }
+  .cap-leaves a { display: block; font-size: 13px; color: var(--fg); padding: 6px 0; border-bottom: 1px solid var(--fg-10); transition: color 0.15s ease, border-color 0.15s ease; }
+  .cap-leaves a:hover { color: var(--accent); border-color: var(--accent); }
+  .cap-cta { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-top: auto; align-self: flex-start; }
+</style>

@@ -1,0 +1,72 @@
+---
+import Base from "~/layouts/Base.astro";
+import { METHOD_STEPS, PILLARS } from "~/lib/content";
+import { absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb } from "~/lib/schema";
+import { t } from "~/lib/i18n";
+
+const locale = "nl" as const;
+const i = t(locale);
+const link = (p: string) => localizedPath(locale, p);
+
+const title = "Aanpak — Methode in 4 stappen & Trust Layer · Banana Navy";
+const description =
+  "Audit → Build → Deploy → Evolve. Vier duidelijke stappen. De laatste is degene die anderen vergeten: we houden je stack up-to-date met uitwisselbare modules, zodat hij na 12 maanden niet obsoleet is.";
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/nl/") },
+    { name: "Aanpak", url: absoluteUrl(link(i.routes.approche)) },
+  ]),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Aanpak · 04 stappen + 04 pijlers</div>
+          <h1 class="display h1" style="margin-top: 24px;">
+            Geen grijze zones.<br /><span style="color: var(--fg-60);">Eén methode, vier stappen.</span>
+          </h1>
+        </div>
+      </div>
+      <div class="method-timeline" style="margin-top: 80px;">
+        <div class="method-line" aria-hidden="true"></div>
+        {METHOD_STEPS.map((step) => (
+          <div class:list={["method-step", step.signature && "is-signature"]}>
+            <div class="method-node">{step.num}</div>
+            <h4 class="method-name">{step.name.nl}</h4>
+            <p class="method-body">{step.body.nl}</p>
+            {step.signature && <span class="method-sig">Onze handtekening</span>}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Trust Layer — 04 pijlers</div>
+          <h2 class="display h2" style="margin-top: 24px;">
+            Geen black box.<br /><span style="color: var(--fg-60);">Je data blijft van jou.</span>
+          </h2>
+        </div>
+      </div>
+      <div class="pillars" style="margin-top: 64px;">
+        {PILLARS.map((p) => (
+          <div class="pillar">
+            <div class="pillar-key">
+              <span>{p.num}</span>
+              <span class="pillar-icon" aria-hidden="true">{p.icon}</span>
+            </div>
+            <h4 class="pillar-title">{p.title.nl}</h4>
+            <p class="pillar-body">{p.body.nl}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>

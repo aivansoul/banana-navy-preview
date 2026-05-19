@@ -1,0 +1,62 @@
+---
+import Base from "~/layouts/Base.astro";
+import LocationPage from "~/components/LocationPage.astro";
+import { LOCATIONS, LOCATION_PAGES_CONTENT } from "~/lib/content";
+import { absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb, localBusinessForCity, faqPage } from "~/lib/schema";
+
+export function getStaticPaths() {
+  return LOCATIONS.map((city) => ({
+    params: { slug: city.slug },
+    props: { city },
+  }));
+}
+
+const locale = "fr" as const;
+const { city } = Astro.props;
+const link = (p: string) => localizedPath(locale, p);
+const cityName = city.name[locale];
+const url = absoluteUrl(link(`/locations/${city.slug}/`));
+const rich = LOCATION_PAGES_CONTENT[city.slug];
+
+const title = rich?.meta?.title[locale]
+  ?? `Banana Navy à ${cityName} — Agents IA, voice agents, automatisations`;
+const description = rich?.meta?.description[locale]
+  ?? `Systèmes IA modulaires pour les entreprises de ${cityName}. Audit gratuit 60 min, agent vocal IA à partir de 3 000 €. ${city.trades.fr}`;
+
+const cityFaq = rich?.faq[locale] ?? [
+  {
+    q: `Banana Navy intervient-elle à ${cityName} ?`,
+    a: `Oui. On travaille régulièrement avec des entreprises à ${cityName} et dans la région. Audits à distance ou sur place selon vos préférences, sprints à distance par défaut — c'est plus rapide et moins cher pour vous.`,
+  },
+  {
+    q: `Quels types d'entreprises servez-vous à ${cityName} ?`,
+    a: `${city.trades.fr} La taille typique : entre 5 et 200 collaborateurs, avec un volume d'appels ou d'opérations suffisant pour qu'un système IA fasse un vrai retour sur investissement.`,
+  },
+  {
+    q: `Comment démarre un projet à ${cityName} ?`,
+    a: `Un audit gratuit de 60 minutes pour cartographier vos workflows et chiffrer le gain potentiel. Si on s'accorde, on enchaîne sur un sprint de 2 semaines avec un premier livrable en production. Vous voyez tout, à chaque étape.`,
+  },
+];
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/") },
+    { name: "Villes", url: absoluteUrl(link("/locations/")) },
+    { name: cityName, url },
+  ]),
+  localBusinessForCity({
+    cityName,
+    postalCode: city.postalCode,
+    lat: city.lat,
+    lon: city.lon,
+    url,
+    description,
+    locale,
+  }),
+  faqPage(cityFaq),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <LocationPage locale={locale} city={city} />
+</Base>

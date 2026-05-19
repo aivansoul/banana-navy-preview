@@ -1,0 +1,34 @@
+---
+import Base from "~/layouts/Base.astro";
+import CategoryOverview from "~/components/CategoryOverview.astro";
+import { SERVICE_CATEGORIES } from "~/lib/content";
+import { absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb, service } from "~/lib/schema";
+
+const locale = "nl" as const;
+const link = (p: string) => localizedPath(locale, p);
+const category = SERVICE_CATEGORIES.find((c) => c.slug === "voice-agents")!;
+
+const title = "Voice Agents — AI Receptionist, Sales, Support · Banana Navy";
+const description =
+  "Voice-agents die 24/7 antwoorden: AI-receptioniste, sales-agent die in 30 seconden kwalificeert, support-agent die oplost of escaleert met volledige context.";
+
+const url = absoluteUrl(link("/voice-agents/"));
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/nl/") },
+    { name: category.head, url },
+  ]),
+  ...category.leaves.map((leaf) =>
+    service({
+      name: leaf.name[locale],
+      description: leaf.claim[locale],
+      url: absoluteUrl(link(`/${category.slug}/${leaf.slug}/`)),
+      category: category.head,
+    }),
+  ),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <CategoryOverview locale={locale} category={category} />
+</Base>

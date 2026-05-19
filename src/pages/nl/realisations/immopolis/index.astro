@@ -1,0 +1,59 @@
+---
+import Base from "~/layouts/Base.astro";
+import { absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb, caseStudy } from "~/lib/schema";
+import { t } from "~/lib/i18n";
+
+const locale = "nl" as const;
+const i = t(locale);
+const link = (p: string) => localizedPath(locale, p);
+
+const title = "Casestudy: Immopolis — Luxe vastgoedplatform · Dubai";
+const description =
+  "Hoe we Immopolis hebben heropgebouwd: editoriaal design, propere productpagina's, RealEstateAgent schema en mobiele performance over 6 woningen van 6 verschillende architecten.";
+const url = absoluteUrl(link(i.routes.realisations) + "immopolis/");
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/nl/") },
+    { name: "Realisaties", url: absoluteUrl(link(i.routes.realisations)) },
+    { name: "Immopolis", url },
+  ]),
+  caseStudy({
+    url,
+    client: "Immopolis",
+    title: "Rebuild luxe vastgoedplatform — Immopolis",
+    description:
+      "Complete rebuild van een platform voor 6 woningen van 6 architecten in Dubai. Editoriaal design, mobiele performance, RealEstateAgent schema.",
+    industry: "Luxury real estate",
+    locale,
+  }),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <section class="section section--light">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Casestudy · Luxe vastgoed</div>
+          <h1 class="display h1" style="margin-top: 24px;">
+            Immopolis<br /><span class="h-accent">6 woningen. 6 architecten. Eén editoriaal venster.</span>
+          </h1>
+        </div>
+      </div>
+      <div class="stub-body" style="margin-top: 64px; max-width: 70ch;">
+        <p><strong>De context.</strong> Immopolis vertegenwoordigt een collectie villa's, penthouses en estates ontworpen door 6 verschillende architecten in Dubai. Het merk wilde een vitrine die de architectuur recht doet zonder een Excel-in-HTML-catalogus te worden.</p>
+        <p><strong>De opdracht.</strong> Een platform herbouwen met: propere productpagina's per residentie, RealEstateAgent + ItemList schema, GEO-metadata voor Dubai, Open Graph + Twitter Cards en mobiele performance ondanks de visuele zwaarte die in luxe verwacht wordt.</p>
+        <p><strong>De ingreep.</strong> Volledige rebuild in static-first, JSON-LD per pagina, eigen sitemap en een propere bundle ter vervanging van de originele export die 32 MB aan HTML woog.</p>
+        <p><strong>De levering.</strong> Platform opgeleverd in modulaire architectuur — nieuwe modules toegevoegd zonder rebuild, technologie-swap zonder verborgen kost, nooit obsolescentie na 12 maanden. De code volgt de web- en AI-evoluties doorheen de sprints.</p>
+      </div>
+      <div style="margin-top: 48px;">
+        <a href={link(i.routes.realisations)} class="btn-line">← Alle realisaties</a>
+      </div>
+    </div>
+  </section>
+  <style>
+    .stub-body p { color: rgba(10, 10, 10, 0.7); line-height: 1.65; }
+    .stub-body p + p { margin-top: 16px; }
+  </style>
+</Base>

@@ -1,0 +1,269 @@
+---
+/**
+ * City-level landing page for Playbook System 1 Step 6
+ * ("the multiplier"). One template, reused for every city × locale.
+ */
+import { type LocationCity, SERVICE_CATEGORIES, ALL_LEAVES, LOCATION_PAGES_CONTENT } from "~/lib/content";
+import { type Locale, localizedPath } from "~/lib/site";
+import { t } from "~/lib/i18n";
+
+interface Props {
+  locale: Locale;
+  city: LocationCity;
+}
+const { locale, city } = Astro.props;
+const i = t(locale);
+const r = i.routes;
+const link = (p: string) => localizedPath(locale, p);
+const cityName = city.name[locale];
+const rich = LOCATION_PAGES_CONTENT[city.slug];
+
+const labels = {
+  fr: {
+    eyebrow: `Banana Navy à ${cityName}`,
+    serving: "Ce qu'on fait à",
+    why_city: "Pourquoi on travaille à",
+    typical_trades: "Tissu local",
+    services_here: "Nos services à",
+    cta_audit: "Audit IA gratuit →",
+    cta_back: "← Toutes les villes",
+    faq_here: `FAQ — ${cityName}`,
+    contact_local: "Discuter d'un projet à",
+  },
+  nl: {
+    eyebrow: `Banana Navy in ${cityName}`,
+    serving: "Wat we doen in",
+    why_city: "Waarom we werken in",
+    typical_trades: "Lokaal weefsel",
+    services_here: "Onze diensten in",
+    cta_audit: "Gratis AI-audit →",
+    cta_back: "← Alle steden",
+    faq_here: `FAQ — ${cityName}`,
+    contact_local: "Een project bespreken in",
+  },
+}[locale];
+
+// City-specific FAQ — three pairs auto-tailored to the city name.
+const cityFaq =
+  locale === "fr"
+    ? [
+        {
+          q: `Banana Navy intervient-elle à ${cityName} ?`,
+          a: `Oui. On travaille régulièrement avec des entreprises à ${cityName} et dans la région. Audits à distance ou sur place selon vos préférences, sprints à distance par défaut — c'est plus rapide et moins cher pour vous.`,
+        },
+        {
+          q: `Quels types d'entreprises servez-vous à ${cityName} ?`,
+          a: `${city.trades.fr} La taille typique : entre 5 et 200 collaborateurs, avec un volume d'appels ou d'opérations suffisant pour qu'un système IA fasse un vrai retour sur investissement.`,
+        },
+        {
+          q: `Comment démarre un projet à ${cityName} ?`,
+          a: `Un audit gratuit de 60 minutes pour cartographier vos workflows et chiffrer le gain potentiel. Si on s'accorde, on enchaîne sur un sprint de 2 semaines avec un premier livrable en production. Vous voyez tout, à chaque étape.`,
+        },
+      ]
+    : [
+        {
+          q: `Werkt Banana Navy in ${cityName}?`,
+          a: `Ja. We werken regelmatig met bedrijven in ${cityName} en de regio. Audits remote of op locatie naar voorkeur, sprints remote als standaard — sneller en goedkoper voor jou.`,
+        },
+        {
+          q: `Welk soort bedrijven bedien je in ${cityName}?`,
+          a: `${city.trades.nl} Typische grootte: tussen 5 en 200 medewerkers, met voldoende oproep- of operationeel volume om een AI-systeem een echte ROI te laten leveren.`,
+        },
+        {
+          q: `Hoe start een project in ${cityName}?`,
+          a: `Een gratis audit van 60 minuten om je workflows in kaart te brengen en de potentiële winst te becijferen. Klikt het? Dan starten we met een sprint van 2 weken met een eerste deliverable in productie. Je ziet alles, bij elke stap.`,
+        },
+      ];
+
+// Pick a tight set of services to highlight per city.
+// All 13 leaves with their parent category — to keep the page useful.
+const featuredLeaves = ALL_LEAVES.slice(0, 9);
+---
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow mono"><span class="dot"></span>{labels.eyebrow}</div>
+        <h1 class="display h1" style="margin-top: 24px;">
+          {rich?.h1 ? (
+            rich.h1[locale]
+          ) : (
+            <>Agents IA & systèmes agentiques<br /><span class="h-accent">{cityName}</span></>
+          )}
+        </h1>
+        <p class="body-l" style="color: var(--fg-60); max-width: 60ch; margin-top: 28px;">
+          {city.angle[locale]}
+        </p>
+        {rich && rich.intro[locale].map((p) => (
+          <p class="body-m" style="margin-top: 20px; max-width: 65ch;">{p}</p>
+        ))}
+      </div>
+    </div>
+
+    <div class="city-grid">
+      <div class="city-main">
+        {rich?.sections && rich.sections.map((sec, idx) => (
+          <>
+            <h2 class="display h3" style={idx === 0 ? "" : "margin-top: 56px;"}>{sec.label[locale]}</h2>
+            {sec.kind === "list" ? (
+              <ul class="city-list" style="margin-top: 16px;">
+                {sec.items[locale].map((item) => <li>{item}</li>)}
+              </ul>
+            ) : (
+              <p class="body-m" style="margin-top: 16px; max-width: 65ch;">{sec.body[locale]}</p>
+            )}
+          </>
+        ))}
+
+        {rich?.stack && (
+          <>
+            <h2 class="display h3" style="margin-top: 56px;">Stack</h2>
+            <p class="body-m mono" style="margin-top: 16px; color: var(--fg-60); font-size: 12px; letter-spacing: 0.02em; line-height: 1.7; max-width: 65ch;">{rich.stack[locale]}</p>
+          </>
+        )}
+
+        {!rich && (
+          <>
+            <h2 class="display h3">{labels.why_city} {cityName}</h2>
+            <p class="body-m" style="margin-top: 16px;">{city.angle[locale]}</p>
+
+            <h2 class="display h3" style="margin-top: 56px;">{labels.typical_trades}</h2>
+            <p class="body-m" style="margin-top: 16px;">{city.trades[locale]}</p>
+
+            <h2 class="display h3" style="margin-top: 56px;">{labels.services_here} {cityName}</h2>
+            <div class="city-leaves">
+              {featuredLeaves.map((leaf) => {
+                const cat = SERVICE_CATEGORIES.find((c) => c.slug === leaf.categorySlug)!;
+                return (
+                  <a class="city-leaf" href={link(`/${cat.slug}/${leaf.slug}/`)}>
+                    <span class="city-leaf-cat">{cat.head}</span>
+                    <span class="city-leaf-name">{leaf.name[locale]}</span>
+                  </a>
+                );
+              })}
+            </div>
+          </>
+        )}
+
+        <h2 class="display h3" style="margin-top: 64px;">{labels.faq_here}</h2>
+        <div class="faq-list" style="margin-top: 24px;">
+          {(rich ? rich.faq[locale] : cityFaq).map((item, idx) => (
+            <details class="faq-item" open={idx === 0}>
+              <summary>
+                <span class="faq-num">{String(idx + 1).padStart(2, "0")}</span>
+                <span class="faq-q">{item.q}</span>
+                <span class="faq-toggle">+</span>
+              </summary>
+              <div class="faq-a">{item.a}</div>
+            </details>
+          ))}
+        </div>
+
+        <div style="margin-top: 64px; display: flex; gap: 16px; flex-wrap: wrap;">
+          <a href={link(r.contact)} class="btn-yellow">{labels.cta_audit}</a>
+          <a href={link("/locations/")} class="btn-line">{labels.cta_back}</a>
+        </div>
+      </div>
+
+      <aside class="city-side">
+        <div class="city-side-block">
+          <h3 class="mono city-side-h">{labels.contact_local} {cityName}</h3>
+          <p class="body-s" style="margin-top: 12px;">
+            Banana Navy SRL<br />
+            Rue Antoine de Saint-Exupéry 2<br />
+            6041 Charleroi, Belgique
+          </p>
+          <p class="body-s" style="margin-top: 12px;">
+            {locale === "fr"
+              ? "Intervention à distance ou sur place selon votre préférence."
+              : "Remote of op locatie volgens voorkeur."}
+          </p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .city-grid {
+    margin-top: 64px;
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .city-grid { grid-template-columns: 1fr; }
+  }
+  .city-leaves {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 600px) {
+    .city-leaves { grid-template-columns: 1fr; }
+  }
+  .city-leaf {
+    display: grid;
+    gap: 6px;
+    padding: 16px;
+    border: 1px solid var(--fg-10);
+    background: rgba(255, 255, 255, 0.02);
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .city-leaf:hover {
+    border-color: var(--accent);
+    background: rgba(255, 215, 56, 0.04);
+  }
+  .city-leaf-cat {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .city-leaf-name {
+    font-family: var(--font-display);
+    font-size: 15px;
+    color: var(--fg);
+    letter-spacing: -0.01em;
+  }
+  .city-side {
+    position: sticky;
+    top: 120px;
+  }
+  .city-side-block {
+    padding: 24px;
+    border: 1px solid var(--fg-10);
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .city-side-h {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: var(--fg-40);
+  }
+  .city-list {
+    margin-top: 16px;
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+    max-width: 65ch;
+  }
+  .city-list li {
+    position: relative;
+    padding-left: 22px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--fg);
+  }
+  .city-list li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--accent);
+    font-family: var(--font-mono);
+  }
+</style>

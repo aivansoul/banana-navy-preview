@@ -1,0 +1,35 @@
+---
+import Base from "~/layouts/Base.astro";
+import AgentChat from "~/components/AgentChat.astro";
+import { TEAM_AGENTS_META } from "~/lib/agents-meta";
+import { localizedPath } from "~/lib/site";
+
+export function getStaticPaths() {
+  return TEAM_AGENTS_META.map((agent) => ({
+    params: { chief: agent.slug },
+    props: { agent },
+  }));
+}
+
+const locale = "fr" as const;
+const { agent } = Astro.props;
+const link = (p: string) => localizedPath(locale, p);
+
+const title = `${agent.name} — Team Agents · Banana Navy (interne)`;
+const description = agent.tagline;
+---
+<Base locale={locale} title={title} description={description} noindex={true}>
+  <section class="section">
+    <div class="container" style="max-width: 900px;">
+      <p class="body-s" style="margin-bottom: 24px;">
+        <a href={link("/team/")}>← Tous les chiefs</a>
+      </p>
+      <AgentChat
+        endpoint="/api/agents/team"
+        agentSlug={agent.slug}
+        agentName={agent.name}
+        agentTagline={agent.tagline}
+      />
+    </div>
+  </section>
+</Base>

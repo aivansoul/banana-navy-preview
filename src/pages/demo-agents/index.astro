@@ -1,0 +1,101 @@
+---
+import Base from "~/layouts/Base.astro";
+import { DEMO_AGENTS_META, DEMO_MAX_TURNS_PER_SESSION } from "~/lib/agents-meta";
+import { absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb } from "~/lib/schema";
+
+const locale = "fr" as const;
+const link = (p: string) => localizedPath(locale, p);
+
+const title = "Démo — Parle à nos agents · Banana Navy";
+const description =
+  "Démo publique des agents Banana Navy. Navigator t'aide à choisir le bon service ; Architect esquisse à quoi ressemblerait ton projet. Démo bridée, audit gratuit pour aller plus loin.";
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/") },
+    { name: "Démo", url: absoluteUrl(link("/demo-agents/")) },
+  ]),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Démo · agents publics</div>
+          <h1 class="display h1" style="margin-top: 24px;">
+            Parle directement à nos agents.
+          </h1>
+          <p class="body-l" style="color: var(--fg-60); max-width: 60ch; margin-top: 28px;">
+            Voici deux de nos agents en démo publique. Ils répondent uniquement sur la base d'infos
+            publiques Banana Navy — pas de devis bétonné, pas de données internes. Pour le vrai
+            chiffrage, l'audit gratuit de 60 minutes prend le relais.
+          </p>
+          <p class="body-m" style="margin-top: 12px;">
+            <strong>Limite démo :</strong> {DEMO_MAX_TURNS_PER_SESSION} tours / session par agent.
+            Modèle utilisé : Claude Haiku 4.5.
+          </p>
+        </div>
+      </div>
+
+      <div class="demo-grid">
+        {DEMO_AGENTS_META.map((a) => (
+          <a href={link(`/demo-agents/${a.slug}/`)} class="demo-card">
+            <span class="demo-name">{a.name}</span>
+            <span class="demo-tag">{a.tagline}</span>
+          </a>
+        ))}
+      </div>
+
+      <div class="demo-cta">
+        <p>Tu veux que ces agents tournent sur <em>tes</em> données ?</p>
+        <a href={link("/contact/")} class="btn-yellow">Audit IA gratuit →</a>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .demo-grid {
+      margin-top: 64px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 700px) { .demo-grid { grid-template-columns: 1fr; } }
+    .demo-card {
+      display: grid;
+      gap: 14px;
+      padding: 32px;
+      border: 1px solid var(--fg-10);
+      background: rgba(255, 255, 255, 0.02);
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+    .demo-card:hover {
+      border-color: var(--accent);
+      background: rgba(255, 215, 56, 0.04);
+    }
+    .demo-name {
+      font-family: var(--font-display);
+      font-size: 32px;
+      color: var(--accent);
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+    }
+    .demo-tag { color: var(--fg-60); font-size: 14px; line-height: 1.6; }
+
+    .demo-cta {
+      margin-top: 80px;
+      padding: 40px;
+      border: 1px dashed var(--fg-20);
+      text-align: center;
+    }
+    .demo-cta p {
+      font-family: var(--font-display);
+      font-size: clamp(20px, 3vw, 28px);
+      letter-spacing: -0.01em;
+      margin-bottom: 24px;
+    }
+    .demo-cta em { color: var(--accent); font-style: normal; }
+  </style>
+</Base>

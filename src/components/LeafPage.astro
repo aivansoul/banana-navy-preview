@@ -1,0 +1,511 @@
+---
+/**
+ * Reusable leaf service page (e.g. /voice-agents/ai-receptionist/).
+ * One template, used by every dynamic [slug] route on each locale.
+ *
+ * If LEAF_PAGES_CONTENT has an entry for `${categorySlug}/${leafSlug}`,
+ * the page renders rich sections (subheadline, intro, Pour qui,
+ * Ce qu'on livre, scenario, ROI, stack, FAQ). Otherwise it falls
+ * back to the lean features-based render.
+ */
+import {
+  type ServiceCategory,
+  type LeafService,
+  LEAF_PAGES_CONTENT,
+} from "~/lib/content";
+import { type Locale, localizedPath } from "~/lib/site";
+import { t } from "~/lib/i18n";
+
+interface Props {
+  locale: Locale;
+  category: ServiceCategory;
+  leaf: LeafService;
+  /** Sibling leaves to show in the "Related" panel. */
+  siblings: LeafService[];
+}
+const { locale, category, leaf, siblings } = Astro.props;
+const i = t(locale);
+const link = (p: string) => localizedPath(locale, p);
+const rich = LEAF_PAGES_CONTENT[`${category.slug}/${leaf.slug}`];
+
+const labels = {
+  fr: {
+    eyebrow: `Service · ${category.head}`,
+    whats_in: "Ce qui est inclus",
+    typical_flow: "Comment on travaille",
+    forQui: "Pour qui",
+    livre: "Ce qu'on livre",
+    roi: "ROI typique",
+    stack: "Stack",
+    faq: "Questions fréquentes",
+    related_in_pillar: "Dans la même couche",
+    cta_audit: "Réserver un audit →",
+    cta_back: "← Tous les services",
+    agent: "Agent",
+    user: "Appelant",
+  },
+  nl: {
+    eyebrow: `Dienst · ${category.head}`,
+    whats_in: "Wat is inbegrepen",
+    typical_flow: "Hoe we werken",
+    forQui: "Voor wie",
+    livre: "Wat we leveren",
+    roi: "Typische ROI",
+    stack: "Stack",
+    faq: "Veelgestelde vragen",
+    related_in_pillar: "In dezelfde laag",
+    cta_audit: "Boek een audit →",
+    cta_back: "← Alle diensten",
+    agent: "Agent",
+    user: "Beller",
+  },
+}[locale];
+
+const flowSteps = [
+  {
+    num: "01",
+    fr: "Audit 60 min — on regarde votre stack actuel et on chiffre le gain.",
+    nl: "Audit van 60 min — we kijken naar je huidige stack en becijferen de winst.",
+  },
+  {
+    num: "02",
+    fr: "Sprint 1 (2 semaines) — premier livrable en prod, mesurable.",
+    nl: "Sprint 1 (2 weken) — eerste meetbare deliverable in productie.",
+  },
+  {
+    num: "03",
+    fr: "Sprint 2–N — itérations sur base des métriques, jamais sur du ressenti.",
+    nl: "Sprint 2–N — iteraties op basis van metrics, nooit op gevoel.",
+  },
+  {
+    num: "04",
+    fr: "Evolve — architecture modulaire qui suit les évolutions de l'IA. Pas de rebuild complet quand la tech change.",
+    nl: "Evolve — modulaire architectuur die mee evolueert met AI. Geen complete rebuild bij elke tech-shift.",
+  },
+] as const;
+---
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow mono"><span class="dot"></span>{labels.eyebrow}</div>
+        <h1 class="display h1" style="margin-top: 24px;">{leaf.name[locale]}</h1>
+        {rich && (
+          <p class="leaf-subheadline">{rich.subheadline[locale]}</p>
+        )}
+        <p class="body-l" style="color: var(--fg-60); max-width: 60ch; margin-top: 28px;">
+          {leaf.claim[locale]}
+        </p>
+        {rich && rich.intro[locale].map((p) => (
+          <p class="body-m leaf-intro-p">{p}</p>
+        ))}
+      </div>
+    </div>
+
+    <div class="leaf-grid">
+      <div class="leaf-main">
+        {rich ? (
+          <>
+            {rich.forQui[locale].length > 0 && (
+              <>
+                <div class="eyebrow mono"><span class="dot"></span>{rich.forQuiLabel ? rich.forQuiLabel[locale] : labels.forQui}</div>
+                <ul class="leaf-list" style="margin-top: 16px;">
+                  {rich.forQui[locale].map((item) => <li>{item}</li>)}
+                </ul>
+              </>
+            )}
+
+            {rich.livre && rich.livre[locale].length > 0 && (
+              <>
+                <div class="eyebrow mono" style={rich.forQui[locale].length > 0 ? "margin-top: 56px;" : ""}><span class="dot"></span>{rich.livreLabel ? rich.livreLabel[locale] : labels.livre}</div>
+                <ul class="leaf-list" style="margin-top: 16px;">
+                  {rich.livre[locale].map((item) => <li>{item}</li>)}
+                </ul>
+              </>
+            )}
+
+            {rich.industries && (
+              <>
+                <div class="eyebrow mono" style="margin-top: 56px;"><span class="dot"></span>{rich.industries.label[locale]}</div>
+                <ul class="leaf-list" style="margin-top: 16px;">
+                  {rich.industries.items[locale].map((item) => <li>{item}</li>)}
+                </ul>
+              </>
+            )}
+
+            {rich.workflow && (
+              <>
+                <div class="eyebrow mono" style="margin-top: 56px;"><span class="dot"></span>{rich.workflow.title[locale]}</div>
+                <div class="leaf-workflow">
+                  {rich.workflow.steps[locale].map((step, idx) => (
+                    <div class="leaf-workflow-step">
+                      <span class="leaf-workflow-num mono">{String(idx + 1).padStart(2, "0")}</span>
+                      <span class="leaf-workflow-text">{step}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {rich.scenario && (
+              <>
+                <div class="eyebrow mono" style="margin-top: 56px;"><span class="dot"></span>{rich.scenario.title[locale]}</div>
+                <div class="leaf-scenario">
+                  {rich.scenario.lines[locale].map((line) => (
+                    <div class:list={["leaf-scenario-line", `is-${line.who}`]}>
+                      <span class="leaf-scenario-who mono">
+                        {line.who === "agent" ? labels.agent : labels.user}
+                      </span>
+                      <p class="leaf-scenario-text">{line.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {rich.caseStudy && (
+              <>
+                <div class="eyebrow mono" style="margin-top: 56px;"><span class="dot"></span>{rich.caseStudy.label[locale]}</div>
+                <div class="leaf-case">
+                  <p class="leaf-case-intro">{rich.caseStudy.intro[locale]}</p>
+                  <ul class="leaf-list leaf-case-bullets">
+                    {rich.caseStudy.bullets[locale].map((b) => <li>{b}</li>)}
+                  </ul>
+                  <p class="leaf-case-outcome">{rich.caseStudy.outcome[locale]}</p>
+                </div>
+              </>
+            )}
+
+            {rich.sections && rich.sections.map((sec) => (
+              <>
+                <div class="eyebrow mono" style="margin-top: 56px;"><span class="dot"></span>{sec.label[locale]}</div>
+                {sec.kind === "list" ? (
+                  <ul class="leaf-list" style="margin-top: 16px;">
+                    {sec.items[locale].map((item) => <li>{item}</li>)}
+                  </ul>
+                ) : (
+                  <p class="body-m" style="margin-top: 16px; max-width: 65ch;">{sec.body[locale]}</p>
+                )}
+              </>
+            ))}
+
+            {rich.roi && (
+              <>
+                <div class="eyebrow mono" style="margin-top: 56px;"><span class="dot"></span>{labels.roi}</div>
+                <p class="leaf-roi">{rich.roi[locale]}</p>
+              </>
+            )}
+
+            {rich.stack && (
+              <>
+                <div class="eyebrow mono" style="margin-top: 56px;"><span class="dot"></span>{labels.stack}</div>
+                <p class="leaf-stack mono">{rich.stack[locale]}</p>
+              </>
+            )}
+
+            <div class="eyebrow mono" style="margin-top: 56px;"><span class="dot"></span>{labels.typical_flow}</div>
+            <div class="leaf-flow">
+              {flowSteps.map((step) => (
+                <div class="leaf-flow-step">
+                  <span class="leaf-flow-num">{step.num}</span>
+                  <p>{step[locale]}</p>
+                </div>
+              ))}
+            </div>
+
+            {rich.faq[locale].length > 0 && (
+              <>
+                <div class="eyebrow mono" style="margin-top: 64px;"><span class="dot"></span>{labels.faq} · {rich.faq[locale].length}</div>
+                <div class="faq-list" style="margin-top: 24px;">
+                  {rich.faq[locale].map((item, idx) => (
+                    <details class="faq-item">
+                      <summary>
+                        <span class="faq-num">{String(idx + 1).padStart(2, "0")}</span>
+                        <span class="faq-q">{item.q}</span>
+                        <span class="faq-toggle">+</span>
+                      </summary>
+                      <div class="faq-a">{item.a}</div>
+                    </details>
+                  ))}
+                </div>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            <h2 class="display h3">{labels.whats_in}</h2>
+            <ul class="lever-features leaf-features">
+              {leaf.features[locale].map((f) => <li>{f}</li>)}
+            </ul>
+
+            <h2 class="display h3" style="margin-top: 64px;">{labels.typical_flow}</h2>
+            <div class="leaf-flow">
+              {flowSteps.map((step) => (
+                <div class="leaf-flow-step">
+                  <span class="leaf-flow-num">{step.num}</span>
+                  <p>{step[locale]}</p>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        <div style="margin-top: 64px; display: flex; gap: 16px; flex-wrap: wrap;">
+          <a href={link(i.routes.contact)} class="btn-yellow">{labels.cta_audit}</a>
+          <a href={link(`/${category.slug}/`)} class="btn-line">{labels.cta_back}</a>
+        </div>
+      </div>
+
+      <aside class="leaf-side">
+        <div class="leaf-side-block">
+          <h3 class="mono leaf-side-h">{labels.related_in_pillar}</h3>
+          <ul class="leaf-side-list">
+            {siblings.map((s) => (
+              <li>
+                <a href={link(`/${category.slug}/${s.slug}/`)}>
+                  {s.name[locale]}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="leaf-side-block">
+          <h3 class="mono leaf-side-h">{category.head}</h3>
+          <p class="body-s">{category.one_liner[locale]}</p>
+          <p style="margin-top: 12px;">
+            <a href={link(`/${category.slug}/`)} class="body-s">
+              {locale === "fr" ? "Voir le service complet →" : "Bekijk de volledige dienst →"}
+            </a>
+          </p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .leaf-subheadline {
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+    margin-top: 28px;
+    max-width: 60ch;
+  }
+  .leaf-intro-p {
+    margin-top: 20px;
+    max-width: 65ch;
+    line-height: 1.65;
+  }
+  .leaf-grid {
+    margin-top: 80px;
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .leaf-grid { grid-template-columns: 1fr; }
+  }
+  .leaf-features {
+    margin-top: 24px;
+  }
+  .leaf-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 10px;
+  }
+  .leaf-list li {
+    position: relative;
+    padding-left: 22px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--fg);
+  }
+  .leaf-list li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--accent);
+    font-family: var(--font-mono);
+  }
+  .leaf-scenario {
+    margin-top: 16px;
+    border-left: 2px solid var(--accent);
+    padding-left: 24px;
+    display: grid;
+    gap: 16px;
+  }
+  .leaf-scenario-line {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 16px;
+    align-items: baseline;
+  }
+  .leaf-scenario-line.is-user {
+    opacity: 0.7;
+  }
+  .leaf-scenario-line.is-user .leaf-scenario-text::before {
+    content: "« ";
+  }
+  .leaf-scenario-line.is-user .leaf-scenario-text::after {
+    content: " »";
+  }
+  .leaf-scenario-who {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fg-40);
+  }
+  .leaf-scenario-line.is-agent .leaf-scenario-who {
+    color: var(--accent);
+  }
+  .leaf-scenario-text {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--fg);
+    margin: 0;
+  }
+  .leaf-workflow {
+    margin-top: 16px;
+    display: grid;
+    gap: 0;
+    border-left: 2px solid var(--fg-10);
+    padding-left: 24px;
+  }
+  .leaf-workflow-step {
+    position: relative;
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 16px;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px dashed var(--fg-10);
+  }
+  .leaf-workflow-step:last-child { border-bottom: 0; }
+  .leaf-workflow-step::before {
+    content: "";
+    position: absolute;
+    left: -26px;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    transform: translateY(-50%);
+  }
+  .leaf-workflow-num {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+  }
+  .leaf-workflow-text {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--fg);
+  }
+
+  .leaf-roi {
+    margin-top: 16px;
+    padding: 20px 24px;
+    background: rgba(255, 215, 56, 0.06);
+    border-left: 3px solid var(--accent);
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 65ch;
+  }
+  .leaf-case {
+    margin-top: 16px;
+    max-width: 65ch;
+  }
+  .leaf-case-intro {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--fg);
+    margin: 0;
+  }
+  .leaf-case-bullets {
+    margin-top: 12px;
+  }
+  .leaf-case-outcome {
+    margin-top: 16px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--accent);
+    font-style: italic;
+  }
+  .leaf-stack {
+    margin-top: 16px;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: var(--fg-60);
+    line-height: 1.7;
+    max-width: 65ch;
+  }
+  .leaf-flow {
+    margin-top: 24px;
+    display: grid;
+    gap: 20px;
+  }
+  .leaf-flow-step {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 16px;
+    align-items: baseline;
+    padding-top: 16px;
+    border-top: 1px solid var(--fg-10);
+  }
+  .leaf-flow-num {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+  }
+  .leaf-flow-step p {
+    color: var(--fg-60);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .leaf-side {
+    display: grid;
+    gap: 32px;
+    position: sticky;
+    top: 120px;
+  }
+  .leaf-side-block {
+    padding: 24px;
+    border: 1px solid var(--fg-10);
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .leaf-side-h {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: var(--fg-40);
+    margin-bottom: 12px;
+  }
+  .leaf-side-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 10px;
+  }
+  .leaf-side-list a {
+    color: var(--fg);
+    border-bottom: 1px solid var(--fg-10);
+    padding-bottom: 8px;
+    display: block;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .leaf-side-list a:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  @media (max-width: 700px) {
+    .leaf-scenario-line { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>

@@ -1,0 +1,62 @@
+---
+import Base from "~/layouts/Base.astro";
+import LocationPage from "~/components/LocationPage.astro";
+import { LOCATIONS, LOCATION_PAGES_CONTENT } from "~/lib/content";
+import { absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb, localBusinessForCity, faqPage } from "~/lib/schema";
+
+export function getStaticPaths() {
+  return LOCATIONS.map((city) => ({
+    params: { slug: city.slug },
+    props: { city },
+  }));
+}
+
+const locale = "nl" as const;
+const { city } = Astro.props;
+const link = (p: string) => localizedPath(locale, p);
+const cityName = city.name[locale];
+const url = absoluteUrl(link(`/locations/${city.slug}/`));
+const rich = LOCATION_PAGES_CONTENT[city.slug];
+
+const title = rich?.meta?.title[locale]
+  ?? `Banana Navy in ${cityName} — AI-agents, voice agents, automatiseringen`;
+const description = rich?.meta?.description[locale]
+  ?? `Modulaire AI-systemen voor bedrijven in ${cityName}. Gratis audit van 60 min, AI voice agent vanaf € 3.000. ${city.trades.nl}`;
+
+const cityFaq = rich?.faq[locale] ?? [
+  {
+    q: `Werkt Banana Navy in ${cityName}?`,
+    a: `Ja. We werken regelmatig met bedrijven in ${cityName} en de regio. Audits remote of op locatie naar voorkeur, sprints remote als standaard — sneller en goedkoper voor jou.`,
+  },
+  {
+    q: `Welk soort bedrijven bedien je in ${cityName}?`,
+    a: `${city.trades.nl} Typische grootte: tussen 5 en 200 medewerkers, met voldoende oproep- of operationeel volume om een AI-systeem een echte ROI te laten leveren.`,
+  },
+  {
+    q: `Hoe start een project in ${cityName}?`,
+    a: `Een gratis audit van 60 minuten om je workflows in kaart te brengen en de potentiële winst te becijferen. Klikt het? Dan starten we met een sprint van 2 weken met een eerste deliverable in productie. Je ziet alles, bij elke stap.`,
+  },
+];
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/nl/") },
+    { name: "Steden", url: absoluteUrl(link("/locations/")) },
+    { name: cityName, url },
+  ]),
+  localBusinessForCity({
+    cityName,
+    postalCode: city.postalCode,
+    lat: city.lat,
+    lon: city.lon,
+    url,
+    description,
+    locale,
+  }),
+  faqPage(cityFaq),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <LocationPage locale={locale} city={city} />
+</Base>

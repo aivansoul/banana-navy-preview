@@ -1,0 +1,252 @@
+---
+/**
+ * Reusable category landing page (e.g. /agentic-systems/, /voice-agents/).
+ * One template, used by the 5 category index files on each locale.
+ *
+ * If HUB_PAGES_CONTENT has an entry for the category slug, the page
+ * renders rich sections (Pour qui, Ce qu'on livre, Stack, Process,
+ * Prix, Timing, FAQ). Otherwise it falls back to leaf cards only.
+ */
+import { type ServiceCategory, HUB_PAGES_CONTENT } from "~/lib/content";
+import { type Locale, localizedPath } from "~/lib/site";
+import { t } from "~/lib/i18n";
+
+interface Props {
+  locale: Locale;
+  category: ServiceCategory;
+}
+const { locale, category } = Astro.props;
+const i = t(locale);
+const link = (p: string) => localizedPath(locale, p);
+const hub = HUB_PAGES_CONTENT[category.slug];
+
+const labels = {
+  fr: {
+    eyebrow: `Services · ${category.head}`,
+    forQui: "Pour qui",
+    livre: "Ce qu'on livre",
+    examples: "Exemples",
+    process: "Méthode",
+    stack: "Stack possible",
+    prix: "Prix",
+    timing: "Timing",
+    leaves: "Dans ce service",
+    faq: "Questions fréquentes",
+    discover: "En savoir plus",
+    audit: "Audit gratuit →",
+    allCaps: "Tous les services",
+  },
+  nl: {
+    eyebrow: `Diensten · ${category.head}`,
+    forQui: "Voor wie",
+    livre: "Wat we leveren",
+    examples: "Voorbeelden",
+    process: "Methode",
+    stack: "Stack",
+    prix: "Prijs",
+    timing: "Timing",
+    leaves: "Binnen deze dienst",
+    faq: "Veelgestelde vragen",
+    discover: "Lees meer",
+    audit: "Gratis audit →",
+    allCaps: "Alle diensten",
+  },
+};
+const L = labels[locale];
+---
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow mono"><span class="dot"></span>{L.eyebrow}</div>
+        <h1 class="display h1" style="margin-top: 24px;">{hub ? hub.h1[locale] : category.head}</h1>
+        {hub && (
+          <p class="hub-subheadline">{hub.subheadline[locale]}</p>
+        )}
+        <p class="body-l" style="color: var(--fg-60); max-width: 60ch; margin-top: 28px;">
+          {category.one_liner[locale]}
+        </p>
+        <p class="body-m" style="margin-top: 20px; max-width: 65ch;">
+          {category.intro[locale]}
+        </p>
+      </div>
+    </div>
+
+    {hub && (
+      <div class="hub-blocks">
+        <div class="hub-block">
+          <div class="eyebrow mono"><span class="dot"></span>{L.forQui}</div>
+          <ul class="hub-list">
+            {hub.forQui[locale].map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+
+        <div class="hub-block">
+          <div class="eyebrow mono"><span class="dot"></span>{L.livre}</div>
+          <ul class="hub-list">
+            {hub.livre[locale].map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+
+        {hub.examples && (
+          <div class="hub-block">
+            <div class="eyebrow mono"><span class="dot"></span>{L.examples}</div>
+            <ul class="hub-list">
+              {hub.examples[locale].map((item) => <li>{item}</li>)}
+            </ul>
+          </div>
+        )}
+
+        {hub.process && (
+          <div class="hub-block">
+            <div class="eyebrow mono"><span class="dot"></span>{L.process}</div>
+            <ol class="hub-list hub-list--ordered">
+              {hub.process[locale].map((item) => <li>{item}</li>)}
+            </ol>
+          </div>
+        )}
+
+        {hub.prix && (
+          <div class="hub-block">
+            <div class="eyebrow mono"><span class="dot"></span>{L.prix}</div>
+            <p class="hub-para">{hub.prix[locale]}</p>
+          </div>
+        )}
+
+        {hub.timing && (
+          <div class="hub-block">
+            <div class="eyebrow mono"><span class="dot"></span>{L.timing}</div>
+            <p class="hub-para">{hub.timing[locale]}</p>
+          </div>
+        )}
+
+        {hub.stack && (
+          <div class="hub-block">
+            <div class="eyebrow mono"><span class="dot"></span>{L.stack}</div>
+            <p class="hub-para hub-stack">{hub.stack[locale]}</p>
+          </div>
+        )}
+      </div>
+    )}
+
+    <div style="margin-top: 64px;">
+      <div class="eyebrow mono"><span class="dot"></span>{L.leaves} · {category.leaves.length}</div>
+    </div>
+
+    <div class="levers-grid" style="margin-top: 32px;">
+      {category.leaves.map((leaf, idx) => (
+        <article class="lever">
+          <div class="lever-head">
+            <span class="num">{String(idx + 1).padStart(2, "0")} / {String(category.leaves.length).padStart(2, "0")}</span>
+            <span>{category.head}</span>
+          </div>
+          <h3 class="lever-title">{leaf.name[locale]}</h3>
+          <p class="lever-claim">{leaf.claim[locale]}</p>
+          <ul class="lever-features">
+            {leaf.features[locale].map((f) => <li>{f}</li>)}
+          </ul>
+          <a href={link(`/${category.slug}/${leaf.slug}/`)} class="lever-discover">
+            <span>{L.discover}</span>
+            <span class="arrow">→</span>
+          </a>
+        </article>
+      ))}
+    </div>
+
+    {hub && hub.faq[locale].length > 0 && (
+      <div class="hub-faq">
+        <div class="eyebrow mono"><span class="dot"></span>{L.faq} · {hub.faq[locale].length}</div>
+        <div class="faq-list" style="margin-top: 32px;">
+          {hub.faq[locale].map((item, idx) => (
+            <details class="faq-item">
+              <summary>
+                <span class="faq-num">{String(idx + 1).padStart(2, "0")}</span>
+                <span class="faq-q">{item.q}</span>
+                <span class="faq-toggle">+</span>
+              </summary>
+              <div class="faq-a">{item.a}</div>
+            </details>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <div style="margin-top: 80px; display: flex; gap: 16px; flex-wrap: wrap;">
+      <a href={link(i.routes.contact)} class="btn-yellow">
+        {hub ? hub.cta[locale] + " →" : L.audit}
+      </a>
+      <a href={link(i.routes.home) + "#services"} class="btn-line">{L.allCaps}</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hub-subheadline {
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+    margin-top: 32px;
+    max-width: 60ch;
+  }
+  .hub-blocks {
+    margin-top: 72px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 48px 64px;
+  }
+  @media (max-width: 900px) {
+    .hub-blocks { grid-template-columns: 1fr; gap: 40px; }
+  }
+  .hub-block .eyebrow { margin-bottom: 20px; }
+  .hub-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 12px;
+  }
+  .hub-list li {
+    position: relative;
+    padding-left: 24px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--fg);
+  }
+  .hub-list li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--accent);
+    font-family: var(--font-mono);
+  }
+  .hub-list--ordered { counter-reset: hub-step; }
+  .hub-list--ordered li {
+    counter-increment: hub-step;
+  }
+  .hub-list--ordered li::before {
+    content: counter(hub-step, decimal-leading-zero);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    font-weight: 600;
+  }
+  .hub-para {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--fg);
+    max-width: 60ch;
+  }
+  .hub-stack {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: var(--fg-60);
+  }
+  .hub-faq {
+    margin-top: 96px;
+    padding-top: 64px;
+    border-top: 1px solid var(--fg-10);
+  }
+</style>

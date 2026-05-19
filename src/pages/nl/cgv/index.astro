@@ -1,0 +1,34 @@
+---
+import Base from "~/layouts/Base.astro";
+import { SITE, absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb } from "~/lib/schema";
+import { t } from "~/lib/i18n";
+
+const locale = "nl" as const;
+const i = t(locale);
+
+const title = "Algemene voorwaarden · Banana Navy SRL";
+const description =
+  "Algemene voorwaarden van toepassing op de diensten van Banana Navy SRL: offertes, bestelling, facturatie, intellectuele eigendom, geschillen.";
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/nl/") },
+    { name: "Algemene voorwaarden", url: absoluteUrl(localizedPath(locale, i.routes.cgv)) },
+  ]),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <section class="section">
+    <div class="container" style="max-width: 760px;">
+      <div class="eyebrow mono"><span class="dot"></span>Juridisch · AV</div>
+      <h1 class="display h1" style="margin-top: 24px;">Algemene voorwaarden</h1>
+      <div class="legal-body">
+        <p>Deze AV regelen de diensten geleverd door {SITE.legalName} (audit, ontwerp en integratie van modulaire AI-systemen, doorlopende operatie, support).</p>
+      </div>
+    </div>
+  </section>
+  <style>
+    .legal-body { margin-top: 40px; display: grid; gap: 20px; color: var(--fg-60); font-size: 15px; line-height: 1.65; }
+  </style>
+</Base>

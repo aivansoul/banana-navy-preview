@@ -1,0 +1,78 @@
+---
+import Base from "~/layouts/Base.astro";
+import { absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb, caseStudy } from "~/lib/schema";
+import { t } from "~/lib/i18n";
+
+const locale = "fr" as const;
+const i = t(locale);
+const link = (p: string) => localizedPath(locale, p);
+
+const title = "Étude de cas : Immopolis — Plateforme immobilière de luxe · Dubaï";
+const description =
+  "Comment nous avons reconstruit Immopolis : design éditorial, pages-produit propres, schema RealEstateAgent, et performances mobiles tenues sur 6 résidences signées par 6 architectes différents.";
+const url = absoluteUrl(link(i.routes.realisations) + "immopolis/");
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/") },
+    { name: "Réalisations", url: absoluteUrl(link(i.routes.realisations)) },
+    { name: "Immopolis", url },
+  ]),
+  caseStudy({
+    url,
+    client: "Immopolis",
+    title: "Refonte plateforme immobilier de luxe — Immopolis",
+    description:
+      "Refonte complète d'une plateforme représentant 6 résidences signées par 6 architectes à Dubaï. Design éditorial, performance mobile, schema RealEstateAgent.",
+    industry: "Immobilier de luxe",
+    locale,
+  }),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <section class="section section--light">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Étude de cas · Immobilier de luxe</div>
+          <h1 class="display h1" style="margin-top: 24px;">
+            Immopolis<br /><span class="h-accent">6 résidences. 6 architectes. Une vitrine éditoriale.</span>
+          </h1>
+        </div>
+      </div>
+
+      <div class="stub-body" style="margin-top: 64px; max-width: 70ch;">
+        <p><strong>Le contexte.</strong> Immopolis représente une collection de villas, penthouses et estates dessinés par 6 architectes différents à Dubaï (Palm Jumeirah, Emirates Hills, Jumeirah Bay, Al Barari, District One, Bluewaters Island). La marque voulait une vitrine qui rende justice à l'architecture sans devenir un catalogue Excel-en-HTML.</p>
+
+        <p><strong>Le mandat.</strong> Reconstruire la plateforme avec : pages-produit propres pour chaque résidence, schema RealEstateAgent + ItemList complet, métadonnées GEO Dubai, Open Graph + Twitter Cards, et performances mobiles tenues malgré la lourdeur visuelle attendue dans le luxe.</p>
+
+        <p><strong>L'intervention.</strong> Refonte complète en statique-first, JSON-LD par page, sitemap dédié, et bundle propre pour remplacer l'export d'origine qui pesait 32 Mo de HTML. Chaque propriété est sa propre URL crawlable avec son schema individuel.</p>
+
+        <p><strong>Le livrable.</strong> Plateforme livrée en architecture modulaire — nouveaux modules ajoutés sans rebuild, swap technologique sans coût caché, jamais d'obsolescence à 12 mois. Le code suit les évolutions du web et de l'IA au fil des sprints.</p>
+      </div>
+
+      <p class="phase-note mono" style="margin-top: 64px;">
+        Phase 3 du plan : ajout des 6 fiches résidence, métriques avant/après, screenshots du nouveau design, et tableau comparatif performances.
+      </p>
+
+      <div style="margin-top: 48px;">
+        <a href={link(i.routes.realisations)} class="btn-line">← Toutes les réalisations</a>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .stub-body p { color: rgba(10, 10, 10, 0.7); line-height: 1.65; }
+    .stub-body p + p { margin-top: 16px; }
+    .phase-note {
+      padding: 12px 16px;
+      border: 1px dashed rgba(10, 10, 10, 0.22);
+      color: rgba(10, 10, 10, 0.6);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      display: inline-block;
+    }
+  </style>
+</Base>

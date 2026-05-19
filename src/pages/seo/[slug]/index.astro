@@ -1,0 +1,42 @@
+---
+import Base from "~/layouts/Base.astro";
+import LeafPage from "~/components/LeafPage.astro";
+import { SERVICE_CATEGORIES, LEAF_PAGES_CONTENT } from "~/lib/content";
+import { absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb, service, faqPage } from "~/lib/schema";
+
+export function getStaticPaths() {
+  const cat = SERVICE_CATEGORIES.find((c) => c.slug === "seo")!;
+  return cat.leaves.map((leaf) => ({
+    params: { slug: leaf.slug },
+    props: { category: cat, leaf, siblings: cat.leaves.filter((l) => l.slug !== leaf.slug) },
+  }));
+}
+
+const locale = "fr" as const;
+const { category, leaf, siblings } = Astro.props;
+const link = (p: string) => localizedPath(locale, p);
+const url = absoluteUrl(link(`/${category.slug}/${leaf.slug}/`));
+const rich = LEAF_PAGES_CONTENT[`${category.slug}/${leaf.slug}`];
+
+const title = rich?.meta?.title[locale] ?? `${leaf.name[locale]} — ${category.head} · Banana Navy`;
+const description = rich?.meta?.description[locale] ?? leaf.claim[locale];
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/") },
+    { name: category.head, url: absoluteUrl(link(`/${category.slug}/`)) },
+    { name: leaf.name[locale], url },
+  ]),
+  service({
+    name: leaf.name[locale],
+    description: leaf.claim[locale],
+    url,
+    category: category.head,
+  }),
+  ...(rich && rich.faq[locale].length > 0 ? [faqPage(rich.faq[locale])] : []),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <LeafPage locale={locale} category={category} leaf={leaf} siblings={siblings} />
+</Base>

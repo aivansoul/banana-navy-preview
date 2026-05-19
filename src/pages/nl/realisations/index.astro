@@ -1,0 +1,63 @@
+---
+import Base from "~/layouts/Base.astro";
+import { CASE_PREVIEWS } from "~/lib/content";
+import { absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb } from "~/lib/schema";
+import { t } from "~/lib/i18n";
+
+const locale = "nl" as const;
+const i = t(locale);
+const link = (p: string) => localizedPath(locale, p);
+
+const title = "AI-realisaties — Belfius, NMBS, ORES & meer · Banana Navy";
+const description =
+  "Concrete cases van AI-systemen in productie. Banken, mobiliteit, energie, vastgoed — voor/na, becijferde winst, team overgedragen.";
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/nl/") },
+    { name: "Realisaties", url: absoluteUrl(link(i.routes.realisations)) },
+  ]),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <section class="section section--light">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Realisaties — casestudies</div>
+          <h1 class="display h1" style="margin-top: 24px;">
+            De resultaten spreken.<br /><span class="h-accent">Zie het zelf.</span>
+          </h1>
+        </div>
+      </div>
+      <div class="results-grid" style="margin-top: 80px;">
+        {CASE_PREVIEWS.map((c) => (
+          <article class="case">
+            <div class="case-video">
+              <div class="case-play" aria-hidden="true">▶</div>
+            </div>
+            <div class="case-label">{c.client} · {c.industry.nl}</div>
+            <div class="case-rows">
+              <div class="case-row">
+                <span class="case-row-tag">Voor</span>
+                <span class="case-row-text" style="color: rgba(10,10,10,0.55);">{c.before.nl}</span>
+              </div>
+              <div class="case-arrow">↓</div>
+              <div class="case-row after">
+                <span class="case-row-tag">Na</span>
+                <span class="case-row-text">{c.after.nl}</span>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+      <div style="margin-top: 80px;">
+        <h2 class="display h3">Lange casestudy: Immopolis</h2>
+        <p class="body-m" style="margin-top: 16px; max-width: 60ch;">
+          De eerste long-form case documenteert de complete rebuild van het Immopolis-platform. <a href={link(i.routes.realisations) + "immopolis/"}>Lees de case →</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,77 @@
+---
+import Base from "~/layouts/Base.astro";
+import { SITE, absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb } from "~/lib/schema";
+import { t } from "~/lib/i18n";
+
+const locale = "nl" as const;
+const i = t(locale);
+
+const title = "Contact — Gratis AI-audit · Banana Navy Charleroi";
+const description =
+  "Boek een gratis AI-audit van 60 minuten. We becijferen de winst, identificeren de quick win en leveren je de roadmap — vrijblijvend.";
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/nl/") },
+    { name: "Contact", url: absoluteUrl(localizedPath(locale, i.routes.contact)) },
+  ]),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Contact · Gratis AI-audit</div>
+          <h1 class="display h1" style="margin-top: 24px;">
+            We kijken samen.<br /><span class="h-accent">60 minuten. Vrijblijvend.</span>
+          </h1>
+          <p class="body-l" style="color: var(--fg-60); max-width: 56ch; margin-top: 28px;">
+            Je legt ons je business uit. We kijken onder de motorkap. We becijferen waar AI een bottleneck kan wegnemen. Je vertrekt met een actieplan, of we nu samenwerken of niet.
+          </p>
+        </div>
+      </div>
+      <div class="contact-grid" style="margin-top: 80px;">
+        <form action="/api/contact" method="post" class="contact-form">
+          <label><span>Voornaam Achternaam</span><input type="text" name="name" required autocomplete="name" /></label>
+          <label><span>Email</span><input type="email" name="email" required autocomplete="email" /></label>
+          <label><span>Onderneming</span><input type="text" name="company" autocomplete="organization" /></label>
+          <label><span>Beschrijf in één zin je nood</span><textarea name="message" rows="4" required></textarea></label>
+          <label class="consent">
+            <input type="checkbox" name="rgpd" required />
+            <span>Ik aanvaard dat mijn gegevens worden verwerkt om mijn aanvraag te beantwoorden (GDPR).</span>
+          </label>
+          <button type="submit" class="btn-yellow">Boek mijn audit →</button>
+          <p class="phase-note mono">Fase 4 — dit formulier wordt aangesloten op een Pages Function (mail + CRM).</p>
+        </form>
+
+        <aside class="contact-side">
+          <h2 class="display h4">Of rechtstreeks</h2>
+          <p class="body-m" style="margin-top: 12px;">
+            <a href={`mailto:${SITE.email}`}>{SITE.email}</a><br />
+            <a href={`tel:${SITE.phone.replace(/\s/g, "")}`}>{SITE.phone}</a>
+          </p>
+          <p class="body-s" style="margin-top: 24px;">
+            {SITE.legalName}<br />
+            {SITE.address.street}<br />
+            {SITE.address.postalCode} {SITE.address.city}<br />
+            België
+          </p>
+          <p class="body-s" style="margin-top: 16px;">BTW {SITE.vatNumber}</p>
+        </aside>
+      </div>
+    </div>
+  </section>
+  <style>
+    .contact-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 64px; align-items: start; }
+    @media (max-width: 900px) { .contact-grid { grid-template-columns: 1fr; } }
+    .contact-form { display: grid; gap: 20px; }
+    .contact-form label { display: grid; gap: 8px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-60); }
+    .contact-form input, .contact-form textarea { width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.04); border: 1px solid var(--fg-20); color: var(--fg); font-family: var(--font-body); font-size: 14px; letter-spacing: normal; text-transform: none; }
+    .contact-form input:focus, .contact-form textarea:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .contact-form .consent { display: flex; align-items: flex-start; gap: 12px; flex-direction: row; text-transform: none; letter-spacing: 0; font-family: var(--font-body); font-size: 12px; line-height: 1.5; }
+    .contact-form .consent input { width: auto; margin-top: 4px; }
+    .phase-note { padding: 12px 16px; border: 1px dashed var(--fg-20); color: var(--fg-40); font-size: 10px; letter-spacing: 0.18em; }
+  </style>
+</Base>

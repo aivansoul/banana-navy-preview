@@ -1,0 +1,81 @@
+---
+import Base from "~/layouts/Base.astro";
+import { CASE_PREVIEWS } from "~/lib/content";
+import { absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb } from "~/lib/schema";
+import { t } from "~/lib/i18n";
+
+const locale = "fr" as const;
+const i = t(locale);
+const link = (p: string) => localizedPath(locale, p);
+
+const title = "Réalisations IA — Belfius, SNCB, ORES & plus · Banana Navy";
+const description =
+  "Cas concrets de systèmes IA livrés en production. Banques, mobilité, énergie, immobilier — avant/après, gains chiffrés, équipe transférée.";
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/") },
+    { name: "Réalisations", url: absoluteUrl(link(i.routes.realisations)) },
+  ]),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <section class="section section--light">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Réalisations — études de cas</div>
+          <h1 class="display h1" style="margin-top: 24px;">
+            Les résultats parlent.<br /><span class="h-accent">Voyez par vous-même.</span>
+          </h1>
+        </div>
+      </div>
+
+      <div class="results-grid" style="margin-top: 80px;">
+        {CASE_PREVIEWS.map((c) => (
+          <article class="case">
+            <div class="case-video">
+              <div class="case-play" aria-hidden="true">▶</div>
+            </div>
+            <div class="case-label">{c.client} · {c.industry.fr}</div>
+            <div class="case-rows">
+              <div class="case-row">
+                <span class="case-row-tag">Avant</span>
+                <span class="case-row-text" style="color: rgba(10,10,10,0.55);">{c.before.fr}</span>
+              </div>
+              <div class="case-arrow">↓</div>
+              <div class="case-row after">
+                <span class="case-row-tag">Après</span>
+                <span class="case-row-text">{c.after.fr}</span>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div style="margin-top: 80px;">
+        <h2 class="display h3">Étude longue : Immopolis</h2>
+        <p class="body-m" style="margin-top: 16px; max-width: 60ch;">
+          Le premier cas long-format documente le rebuild complet de la plateforme Immopolis — design, données, performance, et livraison. <a href={link(i.routes.realisations) + "immopolis/"}>Lire l'étude →</a>
+        </p>
+      </div>
+
+      <p class="phase-note mono" style="margin-top: 64px;">
+        Phase 3 du plan : ajout des études complètes pour chaque client autorisé (challenge, intervention, métriques, doc transférée).
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .phase-note {
+      padding: 12px 16px;
+      border: 1px dashed rgba(10, 10, 10, 0.22);
+      color: rgba(10, 10, 10, 0.6);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      display: inline-block;
+    }
+  </style>
+</Base>

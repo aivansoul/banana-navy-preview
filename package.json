@@ -1,0 +1,23 @@
+{
+  "name": "banana-navy-site",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && node scripts/generate-markdown-mirrors.mjs",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.3.0",
+    "@astrojs/sitemap": "^3.5.0",
+    "astro": "^5.13.0",
+    "three": "^0.169.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.169.0",
+    "cheerio": "^1.0.0",
+    "typescript": "^5.6.3"
+  }
+}

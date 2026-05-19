@@ -1,0 +1,89 @@
+---
+import Base from "~/layouts/Base.astro";
+import { LOCATIONS } from "~/lib/content";
+import { absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb } from "~/lib/schema";
+
+const locale = "nl" as const;
+const link = (p: string) => localizedPath(locale, p);
+
+const title = "Banana Navy in België — Vlaanderen, Brussel, Wallonië · Steden";
+const description =
+  "AI voice agents, automatiseringen en agent-systemen voor bedrijven in Antwerpen, Gent, Mechelen, Knokke, Oostende, Brussel, Charleroi, Luik, Namen en Bergen. Gratis audit, remote of op locatie.";
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/nl/") },
+    { name: "Steden", url: absoluteUrl(link("/locations/")) },
+  ]),
+];
+
+const wallonia = LOCATIONS.filter((l) => l.region === "wallonia");
+const brussels = LOCATIONS.filter((l) => l.region === "brussels");
+const flanders = LOCATIONS.filter((l) => l.region === "flanders");
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Banana Navy in België — {LOCATIONS.length} steden</div>
+          <h1 class="display h1" style="margin-top: 24px;">
+            We spreken NL, FR, EN.<br />
+            <span style="color: var(--fg-60);">We dekken heel België.</span>
+          </h1>
+          <p class="body-l" style="color: var(--fg-60); max-width: 60ch; margin-top: 28px;">
+            Audits remote of op locatie naar voorkeur. Sprints standaard remote — sneller voor jou en goedkoper. We verplaatsen een team wanneer het project het rechtvaardigt.
+          </p>
+        </div>
+      </div>
+
+      <div class="loc-section">
+        <h2 class="display h3">Vlaanderen</h2>
+        <div class="loc-grid">
+          {flanders.map((c) => (
+            <a class="loc-card" href={link(`/locations/${c.slug}/`)}>
+              <span class="loc-name">{c.name.nl}</span>
+              <span class="loc-trades">{c.trades.nl}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div class="loc-section">
+        <h2 class="display h3">Brussel</h2>
+        <div class="loc-grid">
+          {brussels.map((c) => (
+            <a class="loc-card" href={link(`/locations/${c.slug}/`)}>
+              <span class="loc-name">{c.name.nl}</span>
+              <span class="loc-trades">{c.trades.nl}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div class="loc-section">
+        <h2 class="display h3">Wallonië</h2>
+        <div class="loc-grid">
+          {wallonia.map((c) => (
+            <a class="loc-card" href={link(`/locations/${c.slug}/`)}>
+              <span class="loc-name">{c.name.nl}</span>
+              <span class="loc-trades">{c.trades.nl}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .loc-section { margin-top: 64px; }
+  .loc-grid { margin-top: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 1000px) { .loc-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .loc-grid { grid-template-columns: 1fr; } }
+  .loc-card { display: grid; gap: 8px; padding: 20px; border: 1px solid var(--fg-10); background: rgba(255, 255, 255, 0.02); transition: border-color 0.15s ease, background 0.15s ease; }
+  .loc-card:hover { border-color: var(--accent); background: rgba(255, 215, 56, 0.04); }
+  .loc-name { font-family: var(--font-display); font-size: 22px; letter-spacing: -0.01em; color: var(--fg); text-transform: uppercase; }
+  .loc-trades { color: var(--fg-60); font-size: 12px; line-height: 1.55; }
+</style>

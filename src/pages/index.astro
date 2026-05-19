@@ -1,0 +1,672 @@
+---
+import Base from "~/layouts/Base.astro";
+import Hero from "~/components/Hero.astro";
+import TrustBar from "~/components/TrustBar.astro";
+import { faqPage, breadcrumb, service } from "~/lib/schema";
+import {
+  TRUST_CLIENTS,
+  SERVICE_CATEGORIES,
+  PILLARS_3,
+  LAYERS_5,
+  POSITIONING,
+  META_DESCRIPTION,
+  METHOD_STEPS,
+  FAQ,
+  CASE_PREVIEWS,
+  PILLARS,
+  ALL_LEAVES,
+} from "~/lib/content";
+import { absoluteUrl, localizedPath } from "~/lib/site";
+import { t } from "~/lib/i18n";
+
+const locale = "fr" as const;
+const i = t(locale);
+const r = i.routes;
+const link = (p: string) => localizedPath(locale, p);
+
+const title = "Banana Navy — Agents vocaux IA, automatisations et systèmes agentiques";
+const description = META_DESCRIPTION.fr;
+
+const POURQUOI_BULLETS = [
+  "Audit IA de 60 minutes avant tout build.",
+  "Premier agent vocal fonctionnel possible en 1 semaine.",
+  "Starter pack voix à partir de 3.000 €.",
+  "Français, néerlandais et anglais.",
+  "Belgique, Wallonie, Flandre et projets remote.",
+  "Architecture pensée pour SEO, GEO et AI Search.",
+];
+
+const CE_QU_ON_LIVRE = [
+  {
+    key: "communication",
+    title: "Communication",
+    body: "Agents vocaux IA pour appels entrants, qualification, prise de rendez-vous, support de premier niveau et relances automatisées.",
+  },
+  {
+    key: "crm-sales-ops",
+    title: "CRM & sales ops",
+    body: "Automatisations CRM, routage de leads, enrichissement, scoring, rappels, relances J+3, reporting commercial et pipelines plus propres.",
+  },
+  {
+    key: "orchestration",
+    title: "Orchestration agentique",
+    body: "Systèmes multi-agents capables de coordonner recherche, décision, génération, validation humaine et exécution dans vos outils.",
+  },
+  {
+    key: "visibility",
+    title: "Visibilité",
+    body: "Sites IA-ready, SEO technique, GEO, schema.org, llms.txt, markdown mirrors, pages services et pages locales pour être trouvé par Google et cité par les IA.",
+  },
+  {
+    key: "infrastructure",
+    title: "Infrastructure",
+    body: "Déploiement Cloudflare, APIs, webhooks, logs, monitoring, documentation, fallback humain et architecture évolutive.",
+  },
+];
+
+const schema = [
+  faqPage(FAQ.fr),
+  breadcrumb([{ name: "Banana Navy", url: absoluteUrl("/") }]),
+  // One Service schema per leaf — gives AI engines the full taxonomy.
+  ...ALL_LEAVES.map((leaf) =>
+    service({
+      name: leaf.name[locale],
+      description: leaf.claim[locale],
+      url: absoluteUrl(link(`/${leaf.categorySlug}/${leaf.slug}/`)),
+      category: SERVICE_CATEGORIES.find((c) => c.slug === leaf.categorySlug)!.head,
+    }),
+  ),
+];
+---
+<Base
+  locale={locale}
+  title={title}
+  description={description}
+  schema={schema}
+  bodyClass="press-light"
+>
+  <Hero
+    intro={POSITIONING.fr}
+    titleLines={["Intégrez l'IA", "Gardez le contrôle"]}
+    accentWord="contrôle"
+    ctaPrimary={{ label: "Planifier un audit IA →", href: link(r.contact) }}
+    ctaSecondary={{ label: "Voir les systèmes →", href: "#services" }}
+  />
+
+  <TrustBar label="Ils nous ont fait confiance" clients={[...TRUST_CLIENTS]} />
+
+  {/* INTRO SEO/GEO */}
+  <section class="section" id="intro" aria-label="Présentation">
+    <div class="container">
+      <div class="intro-block">
+        <p class="intro-lead">
+          Banana Navy est un studio IA basé en Belgique, spécialisé dans les agents vocaux IA, l'automatisation CRM, l'orchestration agentique et l'optimisation SEO/GEO. Nous travaillons avec des PME, équipes commerciales, services client et directions opérationnelles qui veulent déployer des systèmes IA utiles, mesurables et évolutifs.
+        </p>
+        <p class="intro-body">
+          Un premier agent vocal fonctionnel peut être livré en une semaine à partir de <strong>3.000 €</strong>. Les systèmes plus avancés — intégrations CRM, workflows multi-agents, automatisations internes, RAG, observabilité ou hébergement européen — sont conçus après un audit de 60 minutes.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* POURQUOI BANANA NAVY */}
+  <section class="section" id="pourquoi" aria-label="Pourquoi Banana Navy">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Pourquoi Banana Navy</div>
+          <h2 class="display h2" style="margin-top: 24px;">
+            Pas des outils isolés.<br />
+            <span style="color: var(--fg-60);">Des systèmes qui évoluent.</span>
+          </h2>
+        </div>
+      </div>
+      <div class="pourquoi-grid">
+        <div class="pourquoi-copy">
+          <p>
+            La plupart des projets IA commencent avec un chatbot, une automatisation Make ou une démo qui impressionne pendant une semaine. Puis les modèles changent, les outils changent, les équipes ne savent plus quoi modifier, et le système devient fragile.
+          </p>
+          <p>
+            Banana Navy travaille autrement. Nous concevons des systèmes modulaires : un agent vocal peut changer de fournisseur voix, un workflow CRM peut passer de Make à n8n, une couche LLM peut basculer de Claude à Mistral ou OpenAI, et une base documentaire peut évoluer sans reconstruire tout le projet.
+          </p>
+          <p>
+            Notre objectif n'est pas de vous enfermer dans un outil. Notre objectif est de vous donner une infrastructure IA que votre entreprise peut comprendre, exploiter et faire évoluer.
+          </p>
+        </div>
+        <ul class="pourquoi-bullets">
+          {POURQUOI_BULLETS.map((b) => <li>{b}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  {/* 3 PILLARS */}
+  <section class="section" id="pillars" aria-label="3 piliers">
+    <div class="container">
+      <div class="levers-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>3 piliers — Agents · Create · Automate</div>
+          <h2 class="display h2" style="margin-top: 24px;">Trois piliers.<br />Un seul système.</h2>
+        </div>
+        <p class="body-l" style="color: var(--fg-60); max-width: 480px;">
+          On conçoit des <strong>systèmes agentiques modulaires</strong> qui automatisent la communication, les opérations, la génération de leads et la croissance digitale. Trois piliers, cinq couches, une seule logique : on construit pour que la tech qui bouge ne casse pas votre business — modules interchangeables, jamais d'obsolescence à 12 mois.
+        </p>
+      </div>
+
+      <div class="pillars-3">
+        {PILLARS_3.map((p) => (
+          <article class="pillar-3">
+            <div class="pillar-3-head">
+              <span class="pillar-3-key">{p.title.fr}</span>
+            </div>
+            <p class="pillar-3-tagline">{p.tagline.fr}</p>
+            <div class="pillar-3-cats">
+              {p.categories.map((slug) => {
+                const cat = SERVICE_CATEGORIES.find((c) => c.slug === slug)!;
+                return (
+                  <a href={link(`/${cat.slug}/`)} class="pillar-3-cat-link">
+                    {cat.head} →
+                  </a>
+                );
+              })}
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* 5 LAYERS */}
+  <section class="section" id="layers" aria-label="5 couches">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Architecture — 5 couches</div>
+          <h2 class="display h2" style="margin-top: 24px;">
+            Cinq couches.<br /><span style="color: var(--fg-60);">Une orchestration.</span>
+          </h2>
+        </div>
+        <p class="body-l" style="color: var(--fg-60); max-width: 480px;">
+          Communication, opérations, découverte, interface — et au-dessus de tout, les systèmes agentiques qui orchestrent les quatre autres comme un chef d'orchestre.
+        </p>
+      </div>
+
+      <div class="layers-stack">
+        {LAYERS_5.map((layer) => {
+          const cat = SERVICE_CATEGORIES.find((c) => c.slug === layer.bridgeTo)!;
+          return (
+            <a href={link(`/${cat.slug}/`)} class:list={["layer-row", layer.keystone && "is-keystone"]}>
+              <span class="layer-num">{layer.num}</span>
+              <span class="layer-name">{layer.name.fr}</span>
+              <span class="layer-desc">{layer.desc.fr}</span>
+              <span class="layer-arrow">→</span>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+
+  {/* SERVICES — full 5x cards */}
+  <section class="section" id="services" aria-label="Services">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Services — 05 catégories · 13 services</div>
+          <h2 class="display h2" style="margin-top: 24px;">Ce qu'on construit pour vous.</h2>
+        </div>
+      </div>
+
+      <div class="cap-grid">
+        {SERVICE_CATEGORIES.map((cat) => (
+          <article class="cap-card">
+            <div class="cap-head">
+              <span class="cap-pillar">{cat.head}</span>
+              <span class="cap-pillar-tag">{cat.pillar}</span>
+            </div>
+            <p class="cap-one">{cat.one_liner.fr}</p>
+            <ul class="cap-leaves">
+              {cat.leaves.map((leaf) => (
+                <li>
+                  <a href={link(`/${cat.slug}/${leaf.slug}/`)}>{leaf.name.fr}</a>
+                </li>
+              ))}
+            </ul>
+            <a href={link(`/${cat.slug}/`)} class="cap-cta">
+              Explorer {cat.head} →
+            </a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* CE QU'ON LIVRE */}
+  <section class="section" id="livre" aria-label="Ce qu'on livre">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Ce qu'on livre · 05 domaines</div>
+          <h2 class="display h2" style="margin-top: 24px;">
+            Une couche IA opérationnelle<br />
+            <span style="color: var(--fg-60);">autour de votre business.</span>
+          </h2>
+        </div>
+      </div>
+      <div class="livre-stack">
+        {CE_QU_ON_LIVRE.map((item, idx) => (
+          <article class="livre-layer">
+            <span class="livre-num">{String(idx + 1).padStart(2, "0")}</span>
+            <h3 class="livre-title">{item.title}</h3>
+            <p class="livre-body">{item.body}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* METHOD */}
+  <section class="section" id="method" aria-label="Notre méthode">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Notre méthode — 04 étapes</div>
+          <h2 class="display h2" style="margin-top: 24px;">4 étapes.<br />Pas de zones d'ombre.</h2>
+        </div>
+        <p class="body-l" style="color: var(--fg-60); max-width: 360px;">
+          La dernière étape est celle que les autres oublient. C'est la nôtre.
+        </p>
+      </div>
+      <div class="method-timeline">
+        <div class="method-line" aria-hidden="true"></div>
+        {METHOD_STEPS.map((step) => (
+          <div class:list={["method-step", step.signature && "is-signature"]}>
+            <div class="method-node">{step.num}</div>
+            <h4 class="method-name">{step.name.fr}</h4>
+            <p class="method-body">{step.body.fr}</p>
+            {step.signature && <span class="method-sig">Notre signature</span>}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* RESULTS */}
+  <section class="section section--light" id="results" aria-label="Avant / Après">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Avant / Après — 03 réalisations</div>
+          <h2 class="display h2" style="margin-top: 24px;">
+            Les résultats parlent.<br /><span class="h-accent">Voyez par vous-même.</span>
+          </h2>
+        </div>
+      </div>
+      <div class="results-grid">
+        {CASE_PREVIEWS.map((c) => (
+          <article class="case">
+            <div class="case-video">
+              <div class="case-play" aria-hidden="true">▶</div>
+            </div>
+            <div class="case-label">{c.client} · {c.industry.fr}</div>
+            <div class="case-rows">
+              <div class="case-row">
+                <span class="case-row-tag">Avant</span>
+                <span class="case-row-text" style="color: rgba(10,10,10,0.55);">{c.before.fr}</span>
+              </div>
+              <div class="case-arrow">↓</div>
+              <div class="case-row after">
+                <span class="case-row-tag">Après</span>
+                <span class="case-row-text">{c.after.fr}</span>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+      <div class="results-foot">
+        <a href={link(r.realisations)}>Voir toutes les réalisations →</a>
+      </div>
+    </div>
+  </section>
+
+  {/* TRUST LAYER */}
+  <section class="section" id="trust-layer" aria-label="Trust Layer">
+    <div class="container">
+      <div class="trust-layer-grid">
+        <div class="trust-layer-copy">
+          <div class="eyebrow mono"><span class="dot"></span>Trust Layer — 03 piliers</div>
+          <h2 class="display h2 trust-h2">
+            Pas de boîte noire.<br /><span style="color: var(--fg-60);">Vos données restent les vôtres.</span>
+          </h2>
+          <p>
+            On préfère les modèles open-source quand c'est possible. On documente nos guardrails. On construit des architectures modulaires — quand un meilleur modèle sort dans 6 mois, on swap le module, pas le système. Et on vous montre exactement où passent vos données : chaque prompt, chaque appel, chaque log.
+          </p>
+          <a href={link(r.approche)}>Lire notre approche complète →</a>
+        </div>
+        <div class="trust-venn">
+          {PILLARS.map((p, idx) => (
+            <div class:list={["venn-pillar", `venn-pillar-${idx}`]}>
+              <span class="venn-num">{p.num}</span>
+              <h4 class="venn-title">{p.title.fr}</h4>
+              <p class="venn-body">{p.body.fr}</p>
+            </div>
+          ))}
+          <svg class="venn-diagram" viewBox="0 0 400 320" aria-hidden="true">
+            <circle cx="140" cy="130" r="100" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="260" cy="130" r="100" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="200" cy="220" r="100" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* FAQ */}
+  <section class="section" id="faq" aria-label="Questions fréquentes">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>FAQ — {FAQ.fr.length} questions</div>
+          <h2 class="display h2" style="margin-top: 24px;">Ce que les gens<br />demandent à ChatGPT.</h2>
+          <p class="faq-schema">Schema FAQPage activé · Optimisé pour citation par les moteurs IA en 2026</p>
+        </div>
+      </div>
+      <div class="faq-list">
+        {FAQ.fr.map((item, idx) => (
+          <details class="faq-item">
+            <summary>
+              <span class="faq-num">{String(idx + 1).padStart(2, "0")}</span>
+              <span class="faq-q">{item.q}</span>
+              <span class="faq-toggle">+</span>
+            </summary>
+            <div class="faq-a">{item.a}</div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* FINAL CTA */}
+  <section class="final-cta" id="final-cta" aria-label="Réserver un audit">
+    <div class="eyebrow mono" style="display:inline-flex;gap:12px;align-items:center;margin-bottom:32px;">
+      <span class="dot" style="width:6px;height:6px;background:var(--accent);display:inline-block;"></span>
+      Prêt à lancer ?
+    </div>
+    <h2>Découvrez ce que l'<span class="accent-word">IA</span> peut faire pour vous.</h2>
+    <p>Gratuit · Sans engagement · Avec un livrable concret à la fin</p>
+    <div class="final-cta-actions">
+      <a href={link(r.contact)} class="btn-yellow">Réserver mon audit →</a>
+      <a href={link(r.realisations)} class="btn-line">Voir les réalisations →</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ============ INTRO SEO/GEO ============ */
+  .intro-block {
+    max-width: 72ch;
+    margin: 0 auto;
+  }
+  .intro-lead {
+    font-family: var(--font-display);
+    font-size: 24px;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+    margin-bottom: 24px;
+  }
+  .intro-body {
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--fg-80, var(--fg));
+  }
+  .intro-body strong { color: var(--accent); font-weight: 600; }
+  @media (max-width: 700px) {
+    .intro-lead { font-size: 20px; }
+  }
+
+  /* ============ POURQUOI ============ */
+  .pourquoi-grid {
+    margin-top: 64px;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .pourquoi-grid { grid-template-columns: 1fr; gap: 40px; }
+  }
+  .pourquoi-copy p {
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--fg);
+    margin-bottom: 20px;
+    max-width: 60ch;
+  }
+  .pourquoi-copy p:last-child { margin-bottom: 0; }
+  .pourquoi-bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 14px;
+    border-left: 1px solid var(--fg-10);
+    padding-left: 28px;
+  }
+  .pourquoi-bullets li {
+    position: relative;
+    padding-left: 20px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--fg);
+  }
+  .pourquoi-bullets li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-weight: 600;
+  }
+  @media (max-width: 900px) {
+    .pourquoi-bullets { border-left: none; padding-left: 0; border-top: 1px solid var(--fg-10); padding-top: 24px; }
+  }
+
+  /* ============ CE QU'ON LIVRE — stacked horizontal layers ============ */
+  .livre-stack {
+    margin-top: 64px;
+    border-top: 1px solid var(--fg-20);
+  }
+  .livre-layer {
+    display: grid;
+    grid-template-columns: 80px 280px 1fr;
+    gap: 40px;
+    align-items: center;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--fg-20);
+    transition: background 0.2s ease;
+  }
+  .livre-layer:hover { background: rgba(255, 215, 56, 0.04); }
+  .livre-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+  }
+  .livre-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  .livre-body {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--fg-60);
+    margin: 0;
+    max-width: 60ch;
+  }
+  @media (max-width: 900px) {
+    .livre-layer { grid-template-columns: 60px 1fr; gap: 16px; padding: 24px 0; row-gap: 8px; }
+    .livre-layer .livre-body { grid-column: 1 / -1; max-width: none; }
+  }
+
+  /* ============ 3 PILLARS ============ */
+  .pillars-3 {
+    margin-top: 64px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 900px) {
+    .pillars-3 { grid-template-columns: 1fr; }
+  }
+  .pillar-3 {
+    border: 1px solid var(--fg-10);
+    padding: 36px 28px;
+    background: rgba(255, 255, 255, 0.02);
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .pillar-3:hover {
+    border-color: var(--accent);
+  }
+  .pillar-3-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 20px; }
+  .pillar-3-key {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  .pillar-3-tagline { color: var(--fg-60); font-size: 15px; line-height: 1.55; margin-bottom: 24px; }
+  .pillar-3-cats { display: flex; flex-direction: column; gap: 8px; }
+  .pillar-3-cat-link {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fg);
+    padding: 8px 0;
+    border-bottom: 1px solid var(--fg-20);
+  }
+  .pillar-3-cat-link:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ============ 5 LAYERS ============ */
+  .layers-stack {
+    margin-top: 56px;
+    display: grid;
+    gap: 0;
+    border-top: 1px solid var(--fg-10);
+  }
+  .layer-row {
+    display: grid;
+    grid-template-columns: 60px 200px 1fr 40px;
+    align-items: center;
+    gap: 24px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--fg-10);
+    color: var(--fg);
+    transition: padding 0.25s ease, background 0.25s ease;
+  }
+  .layer-row:hover {
+    padding-left: 16px;
+    background: rgba(255, 215, 56, 0.04);
+  }
+  .layer-row.is-keystone {
+    background: rgba(255, 215, 56, 0.06);
+    border-left: 3px solid var(--accent);
+    padding-left: 13px;
+  }
+  .layer-num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+  }
+  .layer-name {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+  .layer-desc { color: var(--fg-60); font-size: 14px; line-height: 1.55; }
+  .layer-arrow { text-align: right; color: var(--fg-40); }
+  .layer-row:hover .layer-arrow { color: var(--accent); }
+  @media (max-width: 700px) {
+    .layer-row { grid-template-columns: 50px 1fr; row-gap: 8px; }
+    .layer-desc { grid-column: 1 / -1; }
+    .layer-arrow { grid-column: 2; justify-self: end; }
+  }
+
+  /* ============ CAPABILITIES ============ */
+  .cap-grid {
+    margin-top: 64px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 1100px) { .cap-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 700px) { .cap-grid { grid-template-columns: 1fr; } }
+  .cap-card {
+    border: 1px solid var(--fg-10);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.02);
+    transition: border-color 0.2s ease;
+  }
+  .cap-card:hover { border-color: var(--accent); }
+  .cap-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px solid var(--fg-10);
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+  }
+  .cap-pillar {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+  .cap-pillar-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .cap-one { color: var(--fg-60); font-size: 14px; line-height: 1.55; margin-bottom: 20px; }
+  .cap-leaves {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 28px;
+    display: grid;
+    gap: 8px;
+    flex: 1;
+  }
+  .cap-leaves a {
+    display: block;
+    font-size: 13px;
+    color: var(--fg);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--fg-10);
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .cap-leaves a:hover { color: var(--accent); border-color: var(--accent); }
+  .cap-cta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-top: auto;
+    align-self: flex-start;
+  }
+</style>

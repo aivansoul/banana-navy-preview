@@ -1,0 +1,290 @@
+---
+import { type Locale, localizedPath, asset } from "~/lib/site";
+import { t } from "~/lib/i18n";
+import { SERVICE_CATEGORIES } from "~/lib/content";
+import LangSwitcher from "~/components/LangSwitcher.astro";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const i = t(locale);
+const r = i.routes;
+const link = (path: string) => localizedPath(locale, path);
+---
+<nav class="nav-bn" aria-label="Primary">
+  <a href={link(r.home)} class="nav-bn-brand" aria-label="Banana Navy">
+    <img
+      src={asset("/banana-navy-logo.svg")}
+      width="110"
+      height="66"
+      alt="Banana Navy"
+      class="bn-logo"
+    />
+  </a>
+
+  <div class="nav-bn-links">
+    <details class="nav-mega">
+      <summary class="nav-bn-link-style">{i.nav.capabilities}</summary>
+      <div class="nav-mega-panel" role="menu">
+        <ul class="nav-mega-list">
+          {SERVICE_CATEGORIES.map((cat) => (
+            <li class="nav-mega-cat">
+              <a class="nav-mega-cat-link" href={link(`/${cat.slug}/`)} role="menuitem">
+                <span class="nav-mega-cat-head">{cat.head}</span>
+                <span class="nav-mega-cat-arrow" aria-hidden="true">→</span>
+              </a>
+              <ul class="nav-mega-leaves" role="menu">
+                {cat.leaves.map((leaf) => (
+                  <li>
+                    <a href={link(`/${cat.slug}/${leaf.slug}/`)} role="menuitem">
+                      {leaf.name[locale]}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </details>
+
+    <a href={link(r.realisations)}>{i.nav.realisations}</a>
+    <a href={link(r.approche)}>{i.nav.approche}</a>
+    <a href={link(r.lab)}>{i.nav.lab}</a>
+    <a href={link(r.equipe)}>{i.nav.equipe}</a>
+  </div>
+
+  <div class="nav-bn-tail">
+    <LangSwitcher locale={locale} />
+    <a href={link(r.contact)} class="nav-bn-cta">{i.nav.audit_cta}</a>
+  </div>
+</nav>
+
+<style>
+  .nav-bn-tail {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* Mega-menu — uses native <details>/<summary> so it works without JS */
+  .nav-mega {
+    position: relative;
+  }
+  /* Match the other nav links: mono, uppercase, fg-60 color */
+  .nav-mega > summary.nav-bn-link-style {
+    list-style: none;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg-60);
+    padding: 4px 0;
+    user-select: none;
+    transition: color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .nav-mega > summary.nav-bn-link-style:hover { color: var(--fg); }
+  .nav-mega > summary::-webkit-details-marker { display: none; }
+  .nav-mega > summary::after {
+    content: "↓";
+    opacity: 0.55;
+    font-size: 0.9em;
+    margin-left: 2px;
+  }
+  .nav-mega[open] > summary::after {
+    content: "↑";
+  }
+
+  .nav-mega-panel {
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 0;
+    width: 280px;
+    background: #0a0a0a;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0;
+    z-index: 100;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.55);
+  }
+
+  /* Vertical category list — leaves revealed to the right on hover/focus */
+  .nav-mega-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    width: 280px;
+  }
+  .nav-mega-cat {
+    position: relative;
+    border-bottom: 1px solid var(--fg-10);
+  }
+  .nav-mega-cat:last-child { border-bottom: none; }
+  .nav-mega-cat-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 22px;
+    text-decoration: none;
+    color: var(--fg);
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .nav-mega-cat-head {
+    font-family: var(--font-display);
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .nav-mega-cat-arrow {
+    font-size: 13px;
+    color: var(--fg-40);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 0.18s ease, transform 0.18s ease, color 0.18s ease;
+  }
+  .nav-mega-cat:hover > .nav-mega-cat-link,
+  .nav-mega-cat:focus-within > .nav-mega-cat-link {
+    background: rgba(255, 213, 56, 0.06);
+  }
+  .nav-mega-cat:hover .nav-mega-cat-head,
+  .nav-mega-cat:focus-within .nav-mega-cat-head {
+    color: var(--accent);
+  }
+  .nav-mega-cat:hover .nav-mega-cat-arrow,
+  .nav-mega-cat:focus-within .nav-mega-cat-arrow {
+    opacity: 1;
+    transform: translateX(0);
+    color: var(--accent);
+  }
+
+  /* Leaves panel — slides in to the right of the hovered category */
+  .nav-mega-leaves {
+    list-style: none;
+    margin: 0;
+    padding: 24px 26px;
+    position: absolute;
+    top: 0;
+    left: 280px;
+    width: 440px;
+    min-height: 100%;
+    background: #0a0a0a;
+    border-left: 1px solid var(--fg-10);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.55);
+    display: grid;
+    align-content: start;
+    gap: 4px;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s 0.18s;
+    pointer-events: none;
+  }
+  .nav-mega-cat:hover > .nav-mega-leaves,
+  .nav-mega-cat:focus-within > .nav-mega-leaves {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s 0s;
+  }
+  .nav-mega-leaves a {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 14px;
+    color: var(--fg-60);
+    padding: 10px 12px;
+    border-bottom: 1px solid transparent;
+    transition: color 0.15s ease, background 0.15s ease;
+    text-decoration: none;
+  }
+  .nav-mega-leaves a:hover {
+    color: var(--fg);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  @media (max-width: 720px) {
+    .nav-mega-panel { width: calc(100vw - 32px); left: 16px; transform: none; }
+    .nav-mega-list { width: 100%; }
+    /* Mobile: leaves stack under their category (no fly-out) */
+    .nav-mega-leaves {
+      position: static;
+      left: auto;
+      width: 100%;
+      min-height: 0;
+      visibility: visible;
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+      padding: 0 22px 18px;
+      border-left: none;
+      background: transparent;
+    }
+    .nav-mega-cat-arrow { display: none; }
+  }
+
+  /* ============================================================
+     LIGHT-THEME OVERRIDES (active on /lab/ + /nl/lab/ via
+     body[data-theme="light"] set by Base.astro)
+     ============================================================ */
+  :global([data-theme="light"]) .nav-mega-panel {
+    background: #f5f3ec;
+    border: 1px solid rgba(10, 10, 10, 0.10);
+    box-shadow:
+      0 12px 28px -8px rgba(10, 10, 10, 0.18),
+      0 40px 80px -20px rgba(10, 10, 10, 0.22);
+  }
+  :global([data-theme="light"]) .nav-mega-leaves {
+    background: #f5f3ec;
+    border-left: 1px solid rgba(10, 10, 10, 0.10);
+  }
+  :global([data-theme="light"]) .nav-mega-cat { border-bottom-color: rgba(10, 10, 10, 0.10); }
+  :global([data-theme="light"]) .nav-mega-cat-link { color: #0a0a0a; }
+  :global([data-theme="light"]) .nav-mega-cat-head {
+    color: #0a0a0a;
+    font-weight: 600;
+  }
+  :global([data-theme="light"]) .nav-mega-cat:hover > .nav-mega-cat-link,
+  :global([data-theme="light"]) .nav-mega-cat:focus-within > .nav-mega-cat-link {
+    background: rgba(255, 213, 56, 0.14);
+  }
+  :global([data-theme="light"]) .nav-mega-cat:hover .nav-mega-cat-head,
+  :global([data-theme="light"]) .nav-mega-cat:focus-within .nav-mega-cat-head { color: #0a0a0a; }
+  :global([data-theme="light"]) .nav-mega-cat-arrow { color: rgba(10, 10, 10, 0.40); }
+  :global([data-theme="light"]) .nav-mega-cat:hover .nav-mega-cat-arrow,
+  :global([data-theme="light"]) .nav-mega-cat:focus-within .nav-mega-cat-arrow { color: #0a0a0a; }
+  :global([data-theme="light"]) .nav-mega-leaves a {
+    color: rgba(10, 10, 10, 0.70);
+    font-weight: 500;
+  }
+  :global([data-theme="light"]) .nav-mega-leaves a:hover {
+    color: #0a0a0a;
+    background: rgba(10, 10, 10, 0.04);
+  }
+  :global([data-theme="light"]) .nav-mega > summary.nav-bn-link-style {
+    color: rgba(10, 10, 10, 0.70);
+  }
+  :global([data-theme="light"]) .nav-mega > summary.nav-bn-link-style:hover {
+    color: #0a0a0a;
+  }
+</style>
+
+<script>
+  // Close the mega menu when clicking outside or pressing Escape.
+  const mega = document.querySelector<HTMLDetailsElement>(".nav-mega");
+  if (mega) {
+    document.addEventListener("click", (e) => {
+      if (!mega.contains(e.target as Node)) mega.open = false;
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") mega.open = false;
+    });
+  }
+</script>

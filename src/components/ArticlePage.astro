@@ -1,0 +1,164 @@
+---
+import { type ArticleContent, ARTICLES } from "~/lib/content";
+import { type Locale, localizedPath, absoluteUrl } from "~/lib/site";
+import { t } from "~/lib/i18n";
+import "~/styles/press.css";
+
+interface Props {
+  locale: Locale;
+  article: ArticleContent;
+}
+
+const { locale, article } = Astro.props;
+const i = t(locale);
+const link = (p: string) => localizedPath(locale, p);
+
+const labels = {
+  fr: {
+    metadata: "/ METADATA",
+    article: "/ ARTICLE",
+    date: "DATE:",
+    author: "AUTHOR:",
+    reading: "READING TIME:",
+    categories: "CATEGORIES:",
+    share: "SHARE:",
+    minutes: "MINUTES",
+    related: "/ À LIRE AUSSI",
+  },
+  nl: {
+    metadata: "/ METADATA",
+    article: "/ ARTIKEL",
+    date: "DATUM:",
+    author: "AUTEUR:",
+    reading: "LEESDUUR:",
+    categories: "CATEGORIEËN:",
+    share: "DELEN:",
+    minutes: "MINUTEN",
+    related: "/ LEES OOK",
+  },
+}[locale];
+
+const fmtDate = (iso: string) => iso.replaceAll("-", ".");
+
+// Compute reading time from text blocks.
+const wordCount = article.blocks.reduce((n, b) => {
+  if (b.kind === "p" || b.kind === "h2" || b.kind === "h3" || b.kind === "pre") {
+    return n + b.text[locale].split(/\s+/).length;
+  }
+  if (b.kind === "ul") return n + b.items[locale].join(" ").split(/\s+/).length;
+  return n;
+}, article.lead[locale].split(/\s+/).length);
+const readMinutes = Math.max(1, Math.round(wordCount / 200));
+
+const fullUrl = absoluteUrl(link(`/lab/${article.slug}/`));
+const shareTwitter = `https://twitter.com/intent/tweet?url=${encodeURIComponent(fullUrl)}&text=${encodeURIComponent(article.title[locale])}`;
+const shareLinkedIn = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(fullUrl)}`;
+
+const related = ARTICLES.filter((a) => a.slug !== article.slug).slice(0, 3);
+const articleIndex = ARTICLES.findIndex((a) => a.slug === article.slug);
+const figNum = String(articleIndex + 1).padStart(2, "0");
+---
+<article class="press-article">
+  <div class="press-container">
+
+    <header class="press-hero">
+      <h1 class="press-hero-title">{article.title[locale]}</h1>
+
+      <div class="press-hero-thumb" aria-hidden="true">
+        <div class="press-thumb-tag mono">[ FIG. {figNum} ]</div>
+        <div class:list={["press-thumb-stage", article.cover && "has-cover"]} style={article.cover ? `background-image: url(${article.cover});` : ""}></div>
+      </div>
+    </header>
+
+    <div class="press-grid">
+      <aside class="press-meta">
+        <div class="press-eyebrow mono">{labels.metadata}</div>
+
+        <div class="press-meta-row">
+          <span class="press-meta-label mono">{labels.date}</span>
+          <span class="press-meta-value mono">{fmtDate(article.publishedAt)}</span>
+        </div>
+        <div class="press-meta-row">
+          <span class="press-meta-label mono">{labels.author}</span>
+          <span class="press-meta-value mono">BANANA NAVY</span>
+        </div>
+        <div class="press-meta-row">
+          <span class="press-meta-label mono">{labels.reading}</span>
+          <span class="press-meta-value mono">{readMinutes} {labels.minutes}</span>
+        </div>
+        {article.topics && article.topics.length > 0 && (
+          <div class="press-meta-row">
+            <span class="press-meta-label mono">{labels.categories}</span>
+            <span class="press-meta-value mono">
+              {article.topics.map((t) => <span class="press-meta-pill">{t}</span>)}
+            </span>
+          </div>
+        )}
+
+        <div class="press-share">
+          <div class="press-meta-label mono">{labels.share}</div>
+          <a class="press-share-btn" href={shareTwitter} target="_blank" rel="noopener noreferrer">Twitter/X</a>
+          <a class="press-share-btn" href={shareLinkedIn} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        </div>
+      </aside>
+
+      <div class="press-body">
+        <div class="press-eyebrow mono press-eyebrow-body">{labels.article}</div>
+        <p class="press-lead">{article.lead[locale]}</p>
+
+        {article.blocks.map((block) => {
+          if (block.kind === "h2") return <h2 class="press-h2">{block.text[locale]}</h2>;
+          if (block.kind === "h3") return <h3 class="press-h3">{block.text[locale]}</h3>;
+          if (block.kind === "p")  return <p class="press-p">{block.text[locale]}</p>;
+          if (block.kind === "ul") {
+            return (
+              <ul class="press-ul">
+                {block.items[locale].map((item) => <li>{item}</li>)}
+              </ul>
+            );
+          }
+          if (block.kind === "pre") return <pre class="press-pre mono">{block.text[locale]}</pre>;
+          return null;
+        })}
+
+        {article.faq && article.faq[locale].length > 0 && (
+          <section class="press-faq">
+            <h2 class="press-h2">FAQ</h2>
+            <div class="faq-list" style="margin-top: 24px;">
+              {article.faq[locale].map((item, idx) => (
+                <details class="faq-item" open={idx === 0}>
+                  <summary>
+                    <span class="faq-num">{String(idx + 1).padStart(2, "0")}</span>
+                    <span class="faq-q">{item.q}</span>
+                    <span class="faq-toggle">+</span>
+                  </summary>
+                  <div class="faq-a">{item.a}</div>
+                </details>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <footer class="press-cta">
+          <a href={link(article.cta.href)} class="btn-yellow">{article.cta.label[locale]} →</a>
+        </footer>
+      </div>
+    </div>
+
+    {related.length > 0 && (
+      <aside class="press-related">
+        <div class="press-eyebrow mono">{labels.related}</div>
+        <div class="press-related-grid">
+          {related.map((r, idx) => (
+            <a class="press-related-card" href={link(`/lab/${r.slug}/`)}>
+              <span class="press-related-num mono">{String(idx + 1).padStart(2, "0")}</span>
+              <span class="press-related-title">{r.title[locale]}</span>
+              <span class="press-related-lead">{r.lead[locale]}</span>
+            </a>
+          ))}
+        </div>
+      </aside>
+    )}
+  </div>
+</article>
+

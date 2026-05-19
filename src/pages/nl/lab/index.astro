@@ -1,0 +1,170 @@
+---
+import Base from "~/layouts/Base.astro";
+import { ARTICLES } from "~/lib/content";
+import { absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb } from "~/lib/schema";
+import { t } from "~/lib/i18n";
+import "~/styles/press.css";
+
+const locale = "nl" as const;
+const i = t(locale);
+const link = (p: string) => localizedPath(locale, p);
+
+const title = "Lab — Experimenten en lessons learned · Banana Navy";
+const description =
+  "Het studio-journaal: lange artikels over GEO, AI-agents, automatisering en AI-ready architectuur. Concrete inzichten over wat werkt in productie.";
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/nl/") },
+    { name: "Lab", url: absoluteUrl(link(i.routes.lab)) },
+  ]),
+];
+
+const sortedArticles = [...ARTICLES].sort((a, b) =>
+  b.publishedAt.localeCompare(a.publishedAt),
+);
+
+const fmtDate = (iso: string) => iso.replaceAll("-", ".");
+---
+<Base locale={locale} title={title} description={description} schema={schema} bodyClass="press-light">
+  <section class="press-section">
+    <div class="press-container">
+
+      <h1 class="press-h1">
+        Lab<sup class="press-h1-count">({sortedArticles.length})</sup>
+      </h1>
+
+      <div class="press-layout">
+        <aside class="press-aside">
+          <div class="press-aside-head">
+            <span class="press-aside-eyebrow">/ FILTER</span>
+            <button type="button" class="press-aside-clear" id="press-clear">FILTERS WISSEN</button>
+          </div>
+
+          <div class="press-aside-filters">
+            <details class="press-filter" open>
+              <summary><span class="press-filter-caret">▾</span> Type</summary>
+              <ul>
+                <li><label><input type="checkbox" data-filter="type" value="article" />Artikel&nbsp;<span class="press-filter-count">({sortedArticles.length})</span></label></li>
+              </ul>
+            </details>
+
+            <details class="press-filter" open>
+              <summary><span class="press-filter-caret">▾</span> Topic</summary>
+              <ul>
+                <li><label><input type="checkbox" data-filter="topic" value="voice-agents" />Voice Agents</label></li>
+                <li><label><input type="checkbox" data-filter="topic" value="automations" />Automatiseringen</label></li>
+                <li><label><input type="checkbox" data-filter="topic" value="agentic" />Agentic Systems</label></li>
+                <li><label><input type="checkbox" data-filter="topic" value="seo-geo" />SEO &amp; GEO</label></li>
+                <li><label><input type="checkbox" data-filter="topic" value="industry" />Verticals</label></li>
+              </ul>
+            </details>
+          </div>
+
+          <div class="press-fig" id="press-fig">
+            <div class="press-fig-bar">
+              <span class="press-fig-tag mono">[ FIG. <span id="press-fig-num">01</span> ]</span>
+              <span class="press-fig-handle"></span>
+            </div>
+            <div class="press-fig-stage" id="press-fig-stage"></div>
+          </div>
+        </aside>
+
+        <div class="press-main">
+          <div class="press-table-head">
+            <span class="col-date">/ DATE</span>
+            <span class="col-name">/ NAME</span>
+            <span class="col-toggle"></span>
+          </div>
+
+          {sortedArticles.map((article, idx) => (
+            <article
+              class:list={["press-row", idx === 0 && "is-active"]}
+              data-fig={String(idx + 1).padStart(2, "0")}
+              data-cover={article.cover ?? ""}
+              data-href={link(`/lab/${article.slug}/`)}
+            >
+              <div class="press-row-line">
+                <span class="col-date mono">
+                  <span class="press-bullet">■</span>&nbsp;{fmtDate(article.publishedAt)}
+                </span>
+                <a class="col-name press-row-name" href={link(`/lab/${article.slug}/`)}>{article.title.nl}</a>
+                <span class="col-toggle mono">+</span>
+              </div>
+
+              <div class="press-row-detail">
+                <div class="press-row-detail-grid">
+                  <div>
+                    <div class="press-detail-label">SAMENVATTING:</div>
+                    <p class="press-detail-summary">{article.lead.nl}</p>
+                    {article.topics && article.topics.length > 0 && (
+                      <div class="press-detail-topic">
+                        <div class="press-detail-label">TOPIC:</div>
+                        <div class="press-detail-topic-tags">
+                          {article.topics.map((tg) => (
+                            <span class="press-row-pill">{tg}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div class="press-detail-author-col">
+                    <div class="press-detail-label">AUTEUR</div>
+                    <div class="press-detail-author">Banana Navy</div>
+                  </div>
+                </div>
+                <a class="press-row-read" href={link(`/lab/${article.slug}/`)}>Lezen</a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const rows = document.querySelectorAll<HTMLElement>(".press-row");
+      const figNum = document.getElementById("press-fig-num");
+      const stage = document.getElementById("press-fig-stage");
+
+      function setPreview(row: HTMLElement) {
+        if (!figNum || !stage) return;
+        const fig = row.dataset.fig ?? "01";
+        const cover = row.dataset.cover ?? "";
+        figNum.textContent = fig;
+        if (cover) {
+          stage.style.backgroundImage = `url(${cover})`;
+          stage.classList.add("has-cover");
+        } else {
+          stage.style.backgroundImage = "";
+          stage.classList.remove("has-cover");
+        }
+      }
+
+      function setActive(row: HTMLElement) {
+        rows.forEach((r) => r.classList.toggle("is-active", r === row));
+        setPreview(row);
+      }
+
+      rows.forEach((row) => {
+        row.addEventListener("mouseenter", () => setActive(row));
+        row.addEventListener("focusin", () => setActive(row));
+        const toggle = row.querySelector(".col-toggle");
+        toggle?.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setActive(row);
+        });
+      });
+
+      const first = document.querySelector<HTMLElement>(".press-row.is-active");
+      if (first) setPreview(first);
+
+      document.getElementById("press-clear")?.addEventListener("click", () => {
+        document.querySelectorAll<HTMLInputElement>('input[type="checkbox"][data-filter]').forEach((cb) => {
+          cb.checked = false;
+        });
+      });
+    </script>
+  </section>
+</Base>

@@ -1,0 +1,52 @@
+---
+import Base from "~/layouts/Base.astro";
+import { SITE, absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb } from "~/lib/schema";
+import { t } from "~/lib/i18n";
+
+const locale = "fr" as const;
+const i = t(locale);
+
+const title = "Mentions légales · Banana Navy SRL";
+const description =
+  "Mentions légales de Banana Navy SRL, société établie à Charleroi (Belgique). Éditeur, hébergement, contact, propriété intellectuelle.";
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/") },
+    { name: "Mentions légales", url: absoluteUrl(localizedPath(locale, i.routes.mentions)) },
+  ]),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema} noindex={false}>
+  <section class="section">
+    <div class="container" style="max-width: 760px;">
+      <div class="eyebrow mono"><span class="dot"></span>Légal</div>
+      <h1 class="display h1" style="margin-top: 24px;">Mentions légales</h1>
+
+      <div class="legal-body">
+        <h2>Éditeur</h2>
+        <p>{SITE.legalName}<br />{SITE.address.street}<br />{SITE.address.postalCode} {SITE.address.city}, {SITE.address.countryName}</p>
+        <p>Numéro de TVA : {SITE.vatNumber}<br />Email : <a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
+
+        <h2>Hébergement</h2>
+        <p>Cloudflare, Inc. — 101 Townsend St, San Francisco, CA 94107, USA. Données servies depuis le réseau de bord (edge) Cloudflare ; les requêtes EU sont servies depuis les points de présence européens.</p>
+
+        <h2>Propriété intellectuelle</h2>
+        <p>L'ensemble des contenus présents sur ce site (textes, logos, illustrations, code, vidéos) est protégé par le droit d'auteur et reste la propriété de {SITE.legalName} ou de ses partenaires. Toute reproduction sans accord écrit est interdite.</p>
+
+        <h2>Responsabilité</h2>
+        <p>Les informations diffusées sur ce site le sont à titre informatif. {SITE.legalName} ne saurait être tenue responsable d'éventuelles inexactitudes ou de l'usage qui en serait fait par des tiers.</p>
+
+        <p class="phase-note mono">Phase 1 — relecture par votre conseil juridique avant mise en production.</p>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .legal-body { margin-top: 40px; display: grid; gap: 20px; color: var(--fg-60); font-size: 15px; line-height: 1.65; }
+    .legal-body h2 { color: var(--fg); font-family: var(--font-display); font-weight: 500; font-size: 22px; margin-top: 16px; letter-spacing: -0.01em; }
+    .legal-body a { color: var(--accent); }
+    .phase-note { margin-top: 24px; padding: 12px 16px; border: 1px dashed var(--fg-20); color: var(--fg-40); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; display: inline-block; }
+  </style>
+</Base>

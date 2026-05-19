@@ -1,0 +1,51 @@
+---
+import {
+  LOCALES,
+  LOCALE_LABEL,
+  localizedPath,
+  stripLocale,
+  type Locale,
+} from "~/lib/site";
+import { t } from "~/lib/i18n";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const i = t(locale);
+const pathname = Astro.url.pathname;
+const routeKey = stripLocale(pathname.endsWith("/") ? pathname : `${pathname}/`);
+---
+<div class="lang-switcher" role="group" aria-label={i.common.lang_switcher_label}>
+  {LOCALES.map((loc) => (
+    <a
+      href={localizedPath(loc, routeKey)}
+      class:list={["lang-link", { "is-active": loc === locale }]}
+      hreflang={loc}
+      lang={loc}
+      aria-current={loc === locale ? "true" : undefined}
+    >
+      {LOCALE_LABEL[loc]}
+    </a>
+  ))}
+</div>
+
+<style>
+  .lang-switcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .lang-link {
+    color: var(--fg-60);
+    padding: 6px 4px;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .lang-link:hover { color: var(--fg); }
+  .lang-link.is-active { color: var(--accent); }
+</style>

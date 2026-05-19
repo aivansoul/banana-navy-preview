@@ -1,0 +1,38 @@
+---
+interface Props {
+  label: string;
+  clients: string[];
+}
+const { label, clients } = Astro.props;
+// Duplicate visually for the marquee. The aria-hidden copy is also hidden
+// from the markdown mirror walker so AI fetchers don't see the brand list twice.
+const dup = [...clients, ...clients];
+---
+<section class="trust" aria-label="Clients">
+  <div class="container" style="margin-bottom: 20px;">
+    <div class="eyebrow mono" style="display:flex;gap:12px;align-items:center;justify-content:center;">
+      <span style="width:6px;height:6px;background:var(--accent);"></span>
+      {label}
+    </div>
+  </div>
+  <div class="trust-marquee">
+    <div class="trust-track" style="--marquee-dur: 80s;">
+      <span>
+        {clients.map((name, i) => (
+          <>
+            {name}
+            {i < clients.length - 1 && <span class="dot-sep"></span>}
+          </>
+        ))}
+      </span>
+      <span aria-hidden="true" data-mirror-skip>
+        {clients.map((name, i) => (
+          <>
+            {name}
+            {i < clients.length - 1 && <span class="dot-sep"></span>}
+          </>
+        ))}
+      </span>
+    </div>
+  </div>
+</section>

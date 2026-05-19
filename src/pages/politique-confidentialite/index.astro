@@ -1,0 +1,59 @@
+---
+import Base from "~/layouts/Base.astro";
+import { SITE, absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb } from "~/lib/schema";
+import { t } from "~/lib/i18n";
+
+const locale = "fr" as const;
+const i = t(locale);
+
+const title = "Politique de confidentialité (RGPD) · Banana Navy";
+const description =
+  "Comment Banana Navy collecte, utilise et protège vos données personnelles, conformément au RGPD. Vos droits, nos engagements, nos sous-traitants.";
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/") },
+    { name: "Confidentialité", url: absoluteUrl(localizedPath(locale, i.routes.privacy)) },
+  ]),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <section class="section">
+    <div class="container" style="max-width: 760px;">
+      <div class="eyebrow mono"><span class="dot"></span>Légal · RGPD</div>
+      <h1 class="display h1" style="margin-top: 24px;">Politique de confidentialité</h1>
+
+      <div class="legal-body">
+        <p>Cette page décrit comment {SITE.legalName} collecte, utilise et protège les données personnelles que vous nous confiez via ce site.</p>
+
+        <h2>Responsable du traitement</h2>
+        <p>{SITE.legalName} — {SITE.address.street}, {SITE.address.postalCode} {SITE.address.city}, {SITE.address.countryName}. Contact RGPD : <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.</p>
+
+        <h2>Données collectées</h2>
+        <p>Formulaire de contact : nom, email, entreprise, message. Aucune donnée n'est collectée passivement (pas de tracking publicitaire).</p>
+
+        <h2>Finalités</h2>
+        <p>Vous recontacter, qualifier votre demande, planifier l'audit gratuit. Aucune utilisation marketing sans consentement séparé.</p>
+
+        <h2>Conservation</h2>
+        <p>Données conservées 24 mois après le dernier échange, sauf demande de suppression anticipée.</p>
+
+        <h2>Vos droits</h2>
+        <p>Vous disposez d'un droit d'accès, de rectification, d'effacement, d'opposition et de portabilité. Pour les exercer, écrivez-nous à <a href={`mailto:${SITE.email}`}>{SITE.email}</a>. Vous pouvez également déposer une réclamation auprès de l'<a href="https://www.autoriteprotectiondonnees.be/" rel="noopener">Autorité de Protection des Données</a> (Belgique).</p>
+
+        <h2>Sous-traitants</h2>
+        <p>Hébergement : Cloudflare (USA, transfert encadré par les Clauses Contractuelles Types). Email transactionnel : à définir en Phase 4.</p>
+
+        <p class="phase-note mono">Phase 1 — relecture par votre DPO ou conseil juridique avant mise en production.</p>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .legal-body { margin-top: 40px; display: grid; gap: 20px; color: var(--fg-60); font-size: 15px; line-height: 1.65; }
+    .legal-body h2 { color: var(--fg); font-family: var(--font-display); font-weight: 500; font-size: 22px; margin-top: 16px; letter-spacing: -0.01em; }
+    .legal-body a { color: var(--accent); }
+    .phase-note { margin-top: 24px; padding: 12px 16px; border: 1px dashed var(--fg-20); color: var(--fg-40); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; display: inline-block; }
+  </style>
+</Base>

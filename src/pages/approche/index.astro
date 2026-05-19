@@ -1,0 +1,282 @@
+---
+import Base from "~/layouts/Base.astro";
+import { PILLARS } from "~/lib/content";
+import { absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb, faqPage } from "~/lib/schema";
+import { t } from "~/lib/i18n";
+
+const locale = "fr" as const;
+const i = t(locale);
+const link = (p: string) => localizedPath(locale, p);
+
+const title = "Notre approche — Audit, Build, Deploy, Evolve | Banana Navy";
+const description =
+  "Découvrez l'approche Banana Navy pour créer des agents IA, automatisations et systèmes agentiques : audit 60 min, build rapide, déploiement contrôlé et évolution continue.";
+
+const STEPS = [
+  {
+    num: "01",
+    name: "Audit",
+    label: "Audit 60 minutes",
+    body: "En 60 minutes, nous identifions les points où l'IA peut produire un effet mesurable : appels manqués, lenteur de réponse, tâches CRM répétitives, relances oubliées, friction dans le support ou manque de visibilité SEO/GEO. L'objectif n'est pas de « faire de l'IA », mais de choisir un premier cas d'usage rentable.",
+    listTitle: "Ce qu'on cherche",
+    list: [
+      "Les tâches répétitives à fort volume.",
+      "Les pertes de leads ou d'opportunités.",
+      "Les outils déjà en place : CRM, formulaires, calendrier, téléphonie, emails.",
+      "Les contraintes : RGPD, langues, validation humaine, données sensibles.",
+      "Le meilleur premier système à livrer.",
+    ],
+  },
+  {
+    num: "02",
+    name: "Build",
+    label: "Build sprint",
+    body: "Nous construisons un premier système fonctionnel autour d'un périmètre clair : agent vocal, workflow CRM, routage de leads, site IA-ready ou orchestration agentique. Le but est de livrer quelque chose de testable rapidement, pas une stratégie théorique de 80 pages.",
+    listTitle: "Exemple concret",
+    list: [
+      "Au jour 7, un agent vocal starter peut déjà répondre à des appels, qualifier le besoin, collecter les informations clés et créer une action dans votre CRM.",
+      "Les options plus avancées — multilingue, base de connaissance, transfert humain, scoring, reporting — s'ajoutent selon le périmètre.",
+    ],
+  },
+  {
+    num: "03",
+    name: "Deploy",
+    label: "Deploy contrôlé",
+    body: "Le déploiement ne consiste pas seulement à « mettre en ligne ». Nous testons les scénarios, les erreurs, les cas hors-périmètre, la latence, la qualité des réponses, les logs, les intégrations et le fallback humain. Un système IA doit échouer proprement lorsqu'il ne sait pas répondre.",
+    listTitle: "Mesures",
+    list: [
+      "Taux d'appels traités.",
+      "Taux de transfert humain.",
+      "Leads qualifiés.",
+      "Rendez-vous réservés.",
+      "Temps économisé.",
+      "Erreurs ou réponses à corriger.",
+    ],
+  },
+  {
+    num: "04",
+    name: "Evolve",
+    label: "Evolve",
+    body: "Après le lancement, nous suivons ce qui se passe réellement : conversations, erreurs, objections, questions fréquentes, données manquantes, taux de conversion et nouveaux besoins métier. C'est là que le système devient plus utile.",
+    listTitle: "Exemple concret",
+    list: [
+      "Un agent vocal peut commencer comme réceptionniste IA, puis évoluer vers qualification commerciale, relance automatique, scoring de leads et orchestration avec un agent CRM.",
+      "Le système grandit par modules, sans devoir recommencer depuis zéro.",
+    ],
+    signature: true,
+  },
+];
+
+const APPROCHE_FAQ = [
+  {
+    q: "Pourquoi travailler en sprint plutôt qu'en projet long ?",
+    a: "Parce que les meilleurs cas d'usage IA se valident sur le terrain. Un sprint court permet de tester rapidement un agent ou une automatisation réelle, puis d'ajuster selon les appels, les données et les retours utilisateurs.",
+  },
+  {
+    q: "Qu'est-ce que Banana Navy ne fait pas ?",
+    a: "Nous ne vendons pas de démos IA sans plan de production. Nous évitons aussi les systèmes opaques que votre équipe ne peut pas comprendre, maintenir ou faire évoluer. Chaque build doit avoir un usage clair, une documentation et un fallback humain.",
+  },
+  {
+    q: "Que livrez-vous à la fin d'un projet ?",
+    a: "Nous livrons le système fonctionnel, la documentation, les accès, les scénarios couverts, les règles de fallback, les intégrations réalisées et les recommandations d'évolution. Selon le projet, nous ajoutons aussi logs, dashboards, prompts système et schémas d'architecture.",
+  },
+];
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/") },
+    { name: "Approche", url: absoluteUrl(link(i.routes.approche)) },
+  ]),
+  faqPage(APPROCHE_FAQ),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Approche · Audit → Build → Deploy → Evolve</div>
+          <h1 class="display h1" style="margin-top: 24px;">
+            Une approche modulaire pour installer l'IA<br />
+            <span style="color: var(--fg-60);">sans vous enfermer.</span>
+          </h1>
+          <p class="body-l" style="color: var(--fg-60); max-width: 65ch; margin-top: 28px;">
+            L'IA change trop vite pour construire des systèmes rigides. Un modèle performant aujourd'hui peut être dépassé dans 12 mois, un outil peut changer ses prix, une API peut disparaître, un besoin métier peut évoluer. C'est pour cette raison que Banana Navy ne pense pas en « projet IA livré une fois », mais en infrastructure modulaire qui peut évoluer.
+          </p>
+          <p class="body-m" style="margin-top: 20px; max-width: 65ch;">
+            Nous avons choisi le mot « Evolve » parce que c'est là que se joue la valeur réelle. Un agent vocal, une automatisation CRM ou un système agentique ne doit pas être transféré puis oublié. Il doit être observé, ajusté, enrichi et parfois remplacé par de meilleurs composants sans reconstruire tout le système.
+          </p>
+        </div>
+      </div>
+
+      <div class="approche-steps">
+        {STEPS.map((step) => (
+          <article class:list={["approche-step", step.signature && "is-signature"]}>
+            <div class="approche-step-head">
+              <span class="approche-step-num">{step.num}</span>
+              <span class="approche-step-name">{step.name}</span>
+              {step.signature && <span class="approche-step-sig">Notre signature</span>}
+            </div>
+            <h2 class="approche-step-label">{step.label}</h2>
+            <p class="approche-step-body">{step.body}</p>
+            <div class="approche-step-list-head">
+              <span class="mono">{step.listTitle}</span>
+            </div>
+            <ul class="approche-step-list">
+              {step.list.map((item) => <li>{item}</li>)}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>Trust Layer — 03 piliers</div>
+          <h2 class="display h2" style="margin-top: 24px;">
+            Pas de boîte noire.<br /><span style="color: var(--fg-60);">Vos données restent les vôtres.</span>
+          </h2>
+        </div>
+      </div>
+      <div class="pillars" style="margin-top: 64px;">
+        {PILLARS.map((p) => (
+          <div class="pillar">
+            <div class="pillar-key">
+              <span>{p.num}</span>
+            </div>
+            <h4 class="pillar-title">{p.title.fr}</h4>
+            <p class="pillar-body">{p.body.fr}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span>FAQ approche · {APPROCHE_FAQ.length}</div>
+          <h2 class="display h2" style="margin-top: 24px;">Ce que les clients<br />nous demandent.</h2>
+        </div>
+      </div>
+      <div class="faq-list" style="margin-top: 48px;">
+        {APPROCHE_FAQ.map((item, idx) => (
+          <details class="faq-item">
+            <summary>
+              <span class="faq-num">{String(idx + 1).padStart(2, "0")}</span>
+              <span class="faq-q">{item.q}</span>
+              <span class="faq-toggle">+</span>
+            </summary>
+            <div class="faq-a">{item.a}</div>
+          </details>
+        ))}
+      </div>
+
+      <div style="margin-top: 64px; display: flex; gap: 16px; flex-wrap: wrap;">
+        <a href={link(i.routes.contact)} class="btn-yellow">Planifier un audit →</a>
+        <a href={link(i.routes.home) + "#services"} class="btn-line">Voir les services →</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .approche-steps {
+    margin-top: 72px;
+    display: grid;
+    gap: 0;
+    border-top: 1px solid var(--fg-10);
+  }
+  .approche-step {
+    padding: 56px 0;
+    border-bottom: 1px solid var(--fg-10);
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 48px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .approche-step { grid-template-columns: 1fr; gap: 24px; padding: 40px 0; }
+  }
+  .approche-step.is-signature {
+    background: rgba(255, 215, 56, 0.04);
+    padding-left: 24px;
+    border-left: 3px solid var(--accent);
+  }
+  .approche-step-head {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .approche-step-num {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+  }
+  .approche-step-name {
+    font-family: var(--font-display);
+    font-size: 48px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  .approche-step-sig {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-top: 8px;
+  }
+  .approche-step-label {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 500;
+    margin: 0 0 16px;
+    letter-spacing: -0.01em;
+  }
+  .approche-step-body {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--fg);
+    margin-bottom: 28px;
+    max-width: 65ch;
+  }
+  .approche-step-list-head {
+    margin-bottom: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fg-60);
+  }
+  .approche-step-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 10px;
+  }
+  .approche-step-list li {
+    position: relative;
+    padding-left: 22px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--fg);
+  }
+  .approche-step-list li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--accent);
+    font-family: var(--font-mono);
+  }
+</style>

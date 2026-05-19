@@ -1,0 +1,44 @@
+---
+import Base from "~/layouts/Base.astro";
+import { SITE, absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb } from "~/lib/schema";
+import { t } from "~/lib/i18n";
+
+const locale = "nl" as const;
+const i = t(locale);
+
+const title = "Juridische vermeldingen · Banana Navy SRL";
+const description =
+  "Juridische vermeldingen van Banana Navy SRL, gevestigd in Charleroi (België). Uitgever, hosting, contact, intellectuele eigendom.";
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/nl/") },
+    { name: "Juridische vermeldingen", url: absoluteUrl(localizedPath(locale, i.routes.mentions)) },
+  ]),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <section class="section">
+    <div class="container" style="max-width: 760px;">
+      <div class="eyebrow mono"><span class="dot"></span>Juridisch</div>
+      <h1 class="display h1" style="margin-top: 24px;">Juridische vermeldingen</h1>
+      <div class="legal-body">
+        <h2>Uitgever</h2>
+        <p>{SITE.legalName}<br />{SITE.address.street}<br />{SITE.address.postalCode} {SITE.address.city}, België</p>
+        <p>BTW-nummer: {SITE.vatNumber}<br />Email: <a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
+
+        <h2>Hosting</h2>
+        <p>Cloudflare, Inc. — 101 Townsend St, San Francisco, CA 94107, USA. Inhoud wordt geserveerd vanaf het Cloudflare edge-netwerk; EU-aanvragen worden bediend vanaf Europese POP's.</p>
+
+        <h2>Intellectuele eigendom</h2>
+        <p>Alle inhoud op deze site (tekst, logo's, illustraties, code, video's) is auteursrechtelijk beschermd en blijft eigendom van {SITE.legalName} of haar partners. Reproductie zonder schriftelijke toestemming is verboden.</p>
+      </div>
+    </div>
+  </section>
+  <style>
+    .legal-body { margin-top: 40px; display: grid; gap: 20px; color: var(--fg-60); font-size: 15px; line-height: 1.65; }
+    .legal-body h2 { color: var(--fg); font-family: var(--font-display); font-weight: 500; font-size: 22px; margin-top: 16px; letter-spacing: -0.01em; }
+    .legal-body a { color: var(--accent); }
+  </style>
+</Base>

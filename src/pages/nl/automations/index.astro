@@ -1,0 +1,34 @@
+---
+import Base from "~/layouts/Base.astro";
+import CategoryOverview from "~/components/CategoryOverview.astro";
+import { SERVICE_CATEGORIES } from "~/lib/content";
+import { absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb, service } from "~/lib/schema";
+
+const locale = "nl" as const;
+const link = (p: string) => localizedPath(locale, p);
+const category = SERVICE_CATEGORIES.find((c) => c.slug === "automations")!;
+
+const title = "Automations — CRM, Lead Routing, Onboarding · Banana Navy";
+const description =
+  "De operationele flows die je dagen opslokken, geautomatiseerd in uitwisselbare modules: CRM in natuurlijke taal, routing < 30s, geïndustrialiseerde klant-onboarding. Komt er een betere tool, dan wisselen we de module.";
+
+const url = absoluteUrl(link("/automations/"));
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/nl/") },
+    { name: category.head, url },
+  ]),
+  ...category.leaves.map((leaf) =>
+    service({
+      name: leaf.name[locale],
+      description: leaf.claim[locale],
+      url: absoluteUrl(link(`/${category.slug}/${leaf.slug}/`)),
+      category: category.head,
+    }),
+  ),
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <CategoryOverview locale={locale} category={category} />
+</Base>

@@ -1,0 +1,80 @@
+---
+interface Props {
+  intro: string;
+  titleLines: string[];
+  /** Single word inside the final line that should pop in accent yellow. */
+  accentWord?: string;
+  ctaPrimary: { label: string; href: string };
+  ctaSecondary: { label: string; href: string };
+}
+const { intro, titleLines, accentWord, ctaPrimary, ctaSecondary } = Astro.props;
+
+// Find the line containing the accent word so we can wrap just that span.
+function renderLine(line: string) {
+  if (!accentWord || !line.includes(accentWord)) return line;
+  const idx = line.indexOf(accentWord);
+  return {
+    before: line.slice(0, idx),
+    accent: accentWord,
+    after: line.slice(idx + accentWord.length),
+  };
+}
+---
+<header class="hero-bn" data-screen-label="Home">
+  <div class="hero-bn-sticky">
+    <div id="three-container" aria-hidden="true"></div>
+    <div class="hero-vignette" aria-hidden="true"></div>
+    <div class="hero-noise" aria-hidden="true"></div>
+
+    <div class="hero-overlay">
+      <div class="hero-bn-top">
+        <p class="hero-bn-intro">{intro}</p>
+      </div>
+
+      <h1 class="hero-bn-title">
+        {titleLines.map((line) => {
+          const r = renderLine(line);
+          if (typeof r === "string") {
+            return <span class="line">{r}</span>;
+          }
+          return (
+            <span class="line">
+              {r.before}
+              <span class="accent-word">{r.accent}</span>
+              {r.after}
+            </span>
+          );
+        })}
+      </h1>
+
+      <div class="hero-bn-bottom">
+        <div class="hero-bn-actions">
+          <a href={ctaPrimary.href} class="btn-yellow">{ctaPrimary.label}</a>
+          <a href={ctaSecondary.href} class="btn-line">{ctaSecondary.label}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  // Load the heavy three.js island only when the hero is on screen and motion isn't reduced.
+  const container = document.getElementById("three-container");
+  if (container) {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduced) {
+      const obs = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            obs.disconnect();
+            import("./HeroParticles.client.ts").catch((err) => {
+              console.warn("Hero particles failed to load:", err);
+            });
+            break;
+          }
+        }
+      }, { rootMargin: "200px" });
+      obs.observe(container);
+    }
+  }
+</script>
