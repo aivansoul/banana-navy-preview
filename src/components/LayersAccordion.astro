@@ -1,0 +1,316 @@
+---
+/**
+ * LayersAccordion.astro — interactive horizontal image accordion for the
+ * "5 couches" section. One card expanded at a time; hovering (or tapping
+ * on touch) another card swaps the active state.
+ *
+ * Defaults to the keystone layer (Orchestration) being active first.
+ */
+import { LAYERS_5, SERVICE_CATEGORIES } from "~/lib/content";
+import { type Locale, localizedPath } from "~/lib/site";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const link = (path: string) => localizedPath(locale, path);
+
+// Visual moodboard per layer (Unsplash). Cinematic / B&W-friendly shots.
+// Swap these via the data when you have brand-shot images.
+const LAYER_IMAGES: Record<string, string> = {
+  communication: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?q=80&w=1400&auto=format&fit=crop", // close-up mic
+  operations:    "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1400&auto=format&fit=crop", // circuit board
+  discovery:     "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1400&auto=format&fit=crop", // analytics screens
+  interface:     "https://images.unsplash.com/photo-1547658719-da2b51169166?q=80&w=1400&auto=format&fit=crop",  // moody screen
+  orchestration: "https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=1400&auto=format&fit=crop", // orchestra at night
+};
+
+// Find each layer's target service category (for the click-through link)
+const cards = LAYERS_5.map((layer) => {
+  const cat = SERVICE_CATEGORIES.find((c) => c.slug === layer.bridgeTo)!;
+  return {
+    key: layer.key,
+    num: layer.num,
+    name: layer.name[locale],
+    desc: layer.desc[locale],
+    href: link(`/${cat.slug}/`),
+    keystone: !!(layer as { keystone?: boolean }).keystone,
+    image: LAYER_IMAGES[layer.key] ?? "",
+  };
+});
+---
+<div class="layers-accordion" data-layers-accordion>
+  {cards.map((c, i) => (
+    <a
+      class:list={["layer-card", c.keystone && "is-keystone"]}
+      href={c.href}
+      data-layer-card
+      data-index={i}
+      aria-label={`${c.num} — ${c.name}`}
+    >
+      <img
+        class="layer-card-img"
+        src={c.image}
+        alt=""
+        loading="lazy"
+        aria-hidden="true"
+      />
+      <span class="layer-card-tint" aria-hidden="true"></span>
+
+      <span class="layer-card-num">{c.num}</span>
+
+      <span class="layer-card-title">{c.name}</span>
+
+      <span class="layer-card-desc">{c.desc}</span>
+
+      <span class="layer-card-cta" aria-hidden="true">
+        Voir <span class="layer-card-cta-arrow">→</span>
+      </span>
+    </a>
+  ))}
+</div>
+
+<style>
+  /* ============================================================
+     5-LAYERS HORIZONTAL IMAGE ACCORDION
+     ============================================================ */
+  .layers-accordion {
+    display: flex;
+    gap: 14px;
+    width: 100%;
+    height: clamp(420px, 56vh, 540px);
+    margin-top: 56px;
+  }
+
+  .layer-card {
+    position: relative;
+    flex: 0 0 64px;
+    height: 100%;
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: pointer;
+    text-decoration: none;
+    color: #fff;
+    transition: flex-basis 0.7s cubic-bezier(0.45, 0, 0.2, 1);
+    background: #1a1a1a;
+    isolation: isolate;
+  }
+  .layer-card.is-active {
+    flex-basis: 460px;
+  }
+
+  /* Background image + tint */
+  .layer-card-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(1) contrast(1.08) brightness(0.85);
+    transition: filter 0.7s ease, transform 0.7s ease;
+    z-index: 0;
+  }
+  .layer-card.is-active .layer-card-img {
+    filter: grayscale(0.15) contrast(1.04) brightness(0.96);
+    transform: scale(1.04);
+  }
+  .layer-card-tint {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.75) 100%);
+    z-index: 1;
+    transition: background 0.5s ease;
+  }
+  .layer-card.is-active .layer-card-tint {
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.78) 100%);
+  }
+
+  /* Editorial layer number (always visible top-left) */
+  .layer-card-num {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 3;
+    font-family: "Switzer", "Inter Tight", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    color: rgba(255, 255, 255, 0.88);
+  }
+  .layer-card.is-keystone .layer-card-num {
+    color: var(--accent, #fcff61);
+  }
+
+  /* Title: rotated vertically when collapsed, horizontal when active */
+  .layer-card-title {
+    position: absolute;
+    bottom: 88px;
+    left: 50%;
+    z-index: 3;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(16px, 1.4vw, 20px);
+    letter-spacing: -0.01em;
+    color: #fff;
+    white-space: nowrap;
+    transform-origin: left bottom;
+    transform: translateX(-50%) rotate(-90deg) translateY(50%);
+    transition:
+      transform 0.55s cubic-bezier(0.45, 0, 0.2, 1),
+      bottom 0.55s cubic-bezier(0.45, 0, 0.2, 1),
+      left 0.55s cubic-bezier(0.45, 0, 0.2, 1),
+      font-size 0.55s ease;
+  }
+  .layer-card.is-active .layer-card-title {
+    bottom: clamp(60px, 8vh, 80px);
+    left: 28px;
+    transform: translateX(0) rotate(0);
+    font-size: clamp(22px, 2.2vw, 32px);
+  }
+
+  /* Description — only readable when active */
+  .layer-card-desc {
+    position: absolute;
+    bottom: 24px;
+    left: 28px;
+    right: 96px;
+    z-index: 3;
+    font-family: "Switzer", "Inter Tight", system-ui, sans-serif;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.82);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.35s ease 0.15s, transform 0.45s ease 0.15s;
+    pointer-events: none;
+  }
+  .layer-card.is-active .layer-card-desc {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* CTA chip bottom-right when active */
+  .layer-card-cta {
+    position: absolute;
+    bottom: 24px;
+    right: 24px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    font-family: "Switzer", "Inter Tight", system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #fff;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.35s ease 0.2s, transform 0.45s ease 0.2s, background 0.2s ease;
+  }
+  .layer-card.is-active .layer-card-cta {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .layer-card.is-active:hover .layer-card-cta {
+    background: var(--accent, #fcff61);
+    color: #0a0a0a;
+    border-color: var(--accent, #fcff61);
+  }
+  .layer-card-cta-arrow {
+    transition: transform 0.25s ease;
+  }
+  .layer-card.is-active:hover .layer-card-cta-arrow {
+    transform: translateX(3px);
+  }
+
+  /* ----- Responsive ----- */
+  @media (max-width: 900px) {
+    .layers-accordion {
+      flex-direction: column;
+      height: auto;
+      gap: 10px;
+    }
+    .layer-card {
+      flex: 0 0 80px;
+      width: 100%;
+      height: 80px;
+      border-radius: 14px;
+    }
+    .layer-card.is-active {
+      flex-basis: 320px;
+      height: 320px;
+    }
+    .layer-card-title {
+      /* Sideways → horizontal but small on the strip layout */
+      bottom: 50%;
+      left: 24px;
+      transform: translateY(50%) rotate(0);
+      font-size: 15px;
+    }
+    .layer-card.is-active .layer-card-title {
+      bottom: 72px;
+      left: 24px;
+      transform: none;
+      font-size: 22px;
+    }
+    .layer-card-desc {
+      bottom: 24px;
+      left: 24px;
+      right: 24px;
+      font-size: 12.5px;
+    }
+    .layer-card-cta { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .layer-card,
+    .layer-card-img,
+    .layer-card-tint,
+    .layer-card-title,
+    .layer-card-desc,
+    .layer-card-cta { transition: none !important; }
+  }
+</style>
+
+<script>
+  // Accordion behavior — hover (desktop) or tap (touch) to make a card active.
+  const accordion = document.querySelector<HTMLElement>("[data-layers-accordion]");
+  if (accordion) {
+    const cards = Array.from(
+      accordion.querySelectorAll<HTMLElement>("[data-layer-card]"),
+    );
+
+    // Default active: the keystone (last card)
+    const setActive = (idx: number) => {
+      cards.forEach((c, i) => c.classList.toggle("is-active", i === idx));
+    };
+    setActive(cards.length - 1);
+
+    const isTouch = !window.matchMedia("(hover: hover)").matches;
+
+    cards.forEach((card, i) => {
+      // Desktop: hover swaps the active card immediately
+      if (!isTouch) {
+        card.addEventListener("mouseenter", () => setActive(i));
+        card.addEventListener("focus", () => setActive(i));
+      } else {
+        // Touch: first tap activates (no navigation); a second tap follows the link
+        card.addEventListener("click", (e) => {
+          if (!card.classList.contains("is-active")) {
+            e.preventDefault();
+            setActive(i);
+          }
+        });
+      }
+    });
+  }
+</script>

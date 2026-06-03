@@ -1,5 +1,20 @@
 /* ====== Immopolis — Architectural Real Estate ====== */
 
+@font-face {
+  font-family: 'Eurostile';
+  src: url('/fonts/eurostile.TTF') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Eurostile';
+  src: url('/fonts/EuroStyle Normal.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+
 :root {
   --bg: #000000;
   --fg: #ffffff;
@@ -9,15 +24,28 @@
   --fg-10: rgba(255, 255, 255, 0.1);
   --fg-05: rgba(255, 255, 255, 0.05);
   --accent: #ffffff;
-  --font-display: "Inter Tight", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-body: "Inter Tight", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-mono: "Inter Tight", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  /* Urbanist (Google) is the display family for all titles/headings.
+     Switzer + Inter Tight stay as metric-compatible fallbacks while the
+     webfont loads. Body copy keeps Switzer via --font-body. */
+  --font-display: "Urbanist", "Switzer", "Inter Tight", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body: "Switzer", "Inter Tight", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: "Switzer", "Inter Tight", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --max-w: 1440px;
   --pad-x: clamp(20px, 4vw, 56px);
+
+  /* Live "Design Studio" scale tokens (dev panel writes these on :root).
+     Default 1 = no change, so they are inert in production. */
+  --ds-text-scale: 1;
+  --ds-head-scale: 1;
+  --ds-btn-scale: 1;
+  --ds-radius-scale: 1;
 }
 
 [data-theme="light"] {
-  --bg: #f3f1ec;
+  /* Near-white cool gray canvas — boosts contrast with the levitating
+     placeholder cards and lets the yellow scroll-swoop pop. Sits between
+     pure white (#FFFFFF) and the previous lilac (#ECEAF1). */
+  --bg: #F4F4F6;
   --fg: #0a0a0a;
   --fg-60: rgba(10, 10, 10, 0.62);
   --fg-40: rgba(10, 10, 10, 0.42);
@@ -34,7 +62,7 @@ body {
   font-family: var(--font-body);
   background: var(--bg);
   color: var(--fg);
-  font-size: 15px;
+  font-size: calc(15px * var(--ds-text-scale, 1));
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -47,9 +75,14 @@ a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
 img, video { display: block; max-width: 100%; }
 
-/* Graceful fallback for broken external images */
+/* Graceful fallback for broken external images. SVGs ship with their
+   own transparency and must remain seamless — never paint a box behind them. */
 img {
   background: var(--fg-05);
+}
+img[src$=".svg"],
+img[src*=".svg?"] {
+  background: transparent;
 }
 
 /* ============ Type ============ */
@@ -77,14 +110,14 @@ img {
   text-transform: uppercase;
 }
 
-.h1 { font-size: clamp(40px, 7vw, 96px); }
-.h2 { font-size: clamp(32px, 5.5vw, 76px); }
-.h3 { font-size: clamp(24px, 3.4vw, 48px); }
-.h4 { font-size: clamp(18px, 1.6vw, 24px); }
+.h1 { font-size: calc(clamp(40px, 7vw, 96px) * var(--ds-head-scale, 1) * var(--ds-text-scale, 1)); }
+.h2 { font-size: calc(clamp(32px, 5.5vw, 76px) * var(--ds-head-scale, 1) * var(--ds-text-scale, 1)); }
+.h3 { font-size: calc(clamp(24px, 3.4vw, 48px) * var(--ds-head-scale, 1) * var(--ds-text-scale, 1)); }
+.h4 { font-size: calc(clamp(18px, 1.6vw, 24px) * var(--ds-head-scale, 1) * var(--ds-text-scale, 1)); }
 
-.body-l { font-size: 17px; line-height: 1.45; letter-spacing: -0.01em; }
-.body-m { font-size: 14px; line-height: 1.55; color: var(--fg-60); }
-.body-s { font-size: 12px; line-height: 1.5; color: var(--fg-60); }
+.body-l { font-size: calc(17px * var(--ds-text-scale, 1)); line-height: 1.45; letter-spacing: -0.01em; }
+.body-m { font-size: calc(14px * var(--ds-text-scale, 1)); line-height: 1.55; color: var(--fg-60); }
+.body-s { font-size: calc(12px * var(--ds-text-scale, 1)); line-height: 1.5; color: var(--fg-60); }
 
 /* ============ Layout ============ */
 .container {

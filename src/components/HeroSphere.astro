@@ -1,0 +1,208 @@
+---
+/**
+ * HeroSphere.astro — a metallic "liquid" sphere that slowly spins and bobs.
+ *
+ * Three.js: an indexed sphere whose surface is displaced by layered waves each
+ * frame (the chrome ripples), shaded with a champagne PBR metal + a procedural
+ * gradient environment for reflections. Transparent canvas so the page's liquid
+ * water background shows through behind it. Text is separate DOM on top.
+ */
+---
+
+<canvas class="hero-sphere" data-hero-sphere aria-hidden="true"></canvas>
+
+<style>
+  .hero-sphere {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;            /* above the water bg, below the hero text */
+    display: block;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+  }
+  .hero-sphere[data-ready] { opacity: 1; }
+</style>
+
+<script>
+  import * as THREE from "three";
+
+  (() => {
+    const canvas = document.querySelector<HTMLCanvasElement>("[data-hero-sphere]");
+    if (!canvas) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Sphere tint — defaults to the page background colour (--bg) so the metal
+    // reads the same colour as the backdrop. The Design Studio panel can change
+    // it live; the choice persists in localStorage.
+    const STORE_KEY = "bn-design-studio";
+    const readSphere = () => {
+      try { return JSON.parse(localStorage.getItem(STORE_KEY) || "{}").sphere || {}; }
+      catch (e) { return {}; }
+    };
+    const cssBg = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() || "#F4F4F6";
+    const sphereColor = readSphere().color || cssBg;
+
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, preserveDrawingBuffer: true });
+    } catch (e) {
+      return;
+    }
+    renderer.setClearColor(0x000000, 0);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    renderer.setPixelRatio(dpr);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+    camera.position.set(0, 0, 6.2);
+
+    // ---- procedural champagne environment (for metal reflections) ----
+    function makeEnvTexture() {
+      const c = document.createElement("canvas");
+      c.width = 512;
+      c.height = 256;
+      const x = c.getContext("2d")!;
+      const g = x.createLinearGradient(0, 0, 0, 256);
+      g.addColorStop(0.0, "#3a3326");   // warm dark top
+      g.addColorStop(0.35, "#8d7f63");
+      g.addColorStop(0.5, "#fbf4e2");   // bright horizon band
+      g.addColorStop(0.62, "#efe2c4");
+      g.addColorStop(1.0, "#6b5f47");   // bronze floor
+      x.fillStyle = g;
+      x.fillRect(0, 0, 512, 256);
+      // a couple of soft bright streaks → specular glints
+      const streak = (cx: number, cy: number, w: number, h: number, a: number) => {
+        const rg = x.createRadialGradient(cx, cy, 0, cx, cy, Math.max(w, h));
+        rg.addColorStop(0, `rgba(255,255,250,${a})`);
+        rg.addColorStop(1, "rgba(255,255,250,0)");
+        x.save();
+        x.translate(cx, cy);
+        x.scale(w / Math.max(w, h), h / Math.max(w, h));
+        x.translate(-cx, -cy);
+        x.fillStyle = rg;
+        x.fillRect(0, 0, 512, 256);
+        x.restore();
+      };
+      streak(150, 120, 220, 28, 0.85);
+      streak(380, 150, 160, 22, 0.6);
+      const tex = new THREE.CanvasTexture(c);
+      tex.mapping = THREE.EquirectangularReflectionMapping;
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const envRT = pmrem.fromEquirectangular(makeEnvTexture());
+    scene.environment = envRT.texture;
+
+    // ---- the liquid metal sphere ----
+    const RADIUS = 1.5;
+    const geo = new THREE.SphereGeometry(RADIUS, 128, 128);
+    const basePos = geo.attributes.position.array.slice() as Float32Array; // immutable copy
+    const posAttr = geo.attributes.position;
+
+    const mat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(sphereColor),
+      metalness: 1.0,
+      roughness: 0.16,
+      envMapIntensity: 1.35,
+    });
+    const sphere = new THREE.Mesh(geo, mat);
+    scene.add(sphere);
+
+    // a soft key light for an extra highlight on top of the env
+    const key = new THREE.DirectionalLight(0xfff4e0, 1.1);
+    key.position.set(2, 3, 4);
+    scene.add(key);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.15));
+
+    // ---- layered-wave surface displacement (the "liquid" ripples) ----
+    const tmp = new THREE.Vector3();
+    function displace(t: number) {
+      const arr = posAttr.array as Float32Array;
+      for (let i = 0; i < arr.length; i += 3) {
+        const bx = basePos[i], by = basePos[i + 1], bz = basePos[i + 2];
+        // direction = normalized base position
+        const inv = 1 / RADIUS;
+        const nx = bx * inv, ny = by * inv, nz = bz * inv;
+        let d = 0;
+        d += 0.085 * Math.sin(1.9 * bx + t * 0.7) * Math.cos(2.1 * by - t * 0.5);
+        d += 0.065 * Math.sin(2.7 * by + t * 0.6) * Math.cos(2.3 * bz + t * 0.42);
+        d += 0.05 * Math.sin(2.4 * bz - t * 0.55) * Math.cos(2.9 * bx + t * 0.46);
+        d += 0.035 * Math.sin(3.6 * (bx + by + bz) + t * 0.9);
+        const r = RADIUS + d;
+        arr[i] = nx * r;
+        arr[i + 1] = ny * r;
+        arr[i + 2] = nz * r;
+      }
+      posAttr.needsUpdate = true;
+      geo.computeVertexNormals();
+    }
+    displace(0);
+
+    // ---- sizing: sphere biased to the right (like the reference) ----
+    function resize() {
+      const w = Math.max(1, canvas.clientWidth);
+      const h = Math.max(1, canvas.clientHeight);
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      // push the sphere right on wide screens, centre it on narrow ones
+      const wide = w / h > 1.1;
+      sphere.position.x = wide ? RADIUS * 0.95 : 0;
+      const fit = wide ? 1.0 : 0.78;
+      sphere.scale.setScalar(fit);
+    }
+    resize();
+
+    // ---- loop ----
+    let raf = 0;
+    let running = false;
+    let t0 = 0;
+    const frame = (nowMs: number) => {
+      if (!running) return;
+      raf = requestAnimationFrame(frame);
+      if (!t0) t0 = nowMs;
+      const t = (nowMs - t0) / 1000;
+      if (!reduce) {
+        displace(t);
+        sphere.rotation.y = t * 0.18;          // discrete slow spin
+        sphere.rotation.x = Math.sin(t * 0.25) * 0.08;
+        sphere.position.y = Math.sin(t * 0.6) * 0.12; // gentle float
+      }
+      renderer.render(scene, camera);
+    };
+    const start = () => {
+      if (running) return;
+      canvas.setAttribute("data-ready", "");
+      if (reduce) { renderer.render(scene, camera); return; }
+      running = true;
+      raf = requestAnimationFrame(frame);
+    };
+    const stop = () => { running = false; cancelAnimationFrame(raf); };
+
+    start();
+    document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+    window.addEventListener("resize", resize);
+
+    // pause when the hero scrolls fully out of view (perf)
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver(
+        (es) => es.forEach((en) => (en.isIntersecting ? start() : stop())),
+        { threshold: 0 },
+      );
+      io.observe(canvas);
+    }
+
+    // ---- live API for the Design Studio panel ----
+    (window as any).__bnSphere = {
+      getColor: () => "#" + mat.color.getHexString(),
+      setColor: (hex: string) => { mat.color.set(hex); },
+    };
+    window.dispatchEvent(new CustomEvent("bn-sphere-ready"));
+  })();
+</script>

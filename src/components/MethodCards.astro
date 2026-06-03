@@ -1,0 +1,252 @@
+---
+/**
+ * MethodCards.astro — the 4-step method shown as a deck of cards that
+ * "deals" out and flips to reveal each step, scrubbed to scroll.
+ *
+ * Back (face-down): the yellow Banana Navy logo + the step title in
+ * semi-transparent yellow. Front: the step content, sized to fill the card.
+ */
+import { METHOD_STEPS } from "~/lib/content";
+import { asset } from "~/lib/site";
+
+interface Props {
+  locale?: "fr" | "nl";
+}
+const { locale = "fr" } = Astro.props;
+const logo = asset("/banana-navy-logo.svg");
+---
+
+<div class="mcards" data-mcards>
+  {METHOD_STEPS.map((step, i) => (
+    <div class:list={["mcard", (step as any).signature && "is-signature"]} data-mcard style={`--i:${i}`}>
+      <div class="mcard-inner" data-mcard-inner>
+        {/* back / face-down — yellow logo + semi-transparent yellow title */}
+        <div class="mcard-face mcard-back" aria-hidden="true">
+          <span class="mcard-logo" style={`-webkit-mask-image:url('${logo}');mask-image:url('${logo}')`}></span>
+          <span class="mcard-back-title">{step.name[locale]}</span>
+        </div>
+        {/* front / content — fills the card */}
+        <div class="mcard-face mcard-front">
+          <div class="mcard-front-head">
+            <span class="mcard-num">{step.num}</span>
+            {(step as any).signature && <span class="mcard-star" aria-hidden="true">★</span>}
+          </div>
+          <h3 class="mcard-name">{step.name[locale]}</h3>
+          <p class="mcard-body">{step.body[locale]}</p>
+          {(step as any).signature && <span class="mcard-sig">Notre signature</span>}
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .mcards {
+    margin-top: clamp(36px, 5vh, 64px);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+    gap: clamp(14px, 1.8vw, 26px);
+    width: 100%;
+  }
+  .mcard {
+    flex: 0 0 clamp(176px, 18.5vw, 224px);
+    aspect-ratio: 3 / 4;
+    perspective: 1500px;
+    will-change: transform;
+  }
+  .mcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .mcard-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    overflow: hidden;
+  }
+
+  /* ---- back (face-down) ---- */
+  .mcard-back {
+    transform: rotateY(180deg);
+    background: linear-gradient(165deg, #141824 0%, #0a0a0a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.6);
+  }
+  .mcard-back::before {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 10px;
+    pointer-events: none;
+  }
+  .mcard-logo {
+    position: absolute;
+    top: clamp(16px, 2vw, 22px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: clamp(58px, 6.5vw, 84px);
+    height: clamp(26px, 3vw, 38px);
+    background: var(--accent, #fcff61);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+  }
+  .mcard-back-title {
+    font-family: var(--font-display);
+    font-size: clamp(24px, 3vw, 40px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 0 14px;
+    color: rgba(252, 255, 97, 0.17);   /* semi-transparent yellow title */
+  }
+  .is-signature .mcard-back { border-color: rgba(252, 255, 97, 0.45); }
+  .is-signature .mcard-back-title { color: rgba(252, 255, 97, 0.26); }
+
+  /* ---- front (content — fills the card) ---- */
+  .mcard-front {
+    background: #ffffff;
+    border: 1px solid rgba(10, 10, 10, 0.1);
+    color: #0a0a0a;
+    display: flex;
+    flex-direction: column;
+    padding: clamp(14px, 1.2vw, 20px);
+    box-shadow: 0 30px 60px -34px rgba(0, 0, 0, 0.4);
+  }
+  .is-signature .mcard-front {
+    border-color: rgba(252, 255, 97, 0.9);
+    box-shadow:
+      0 30px 60px -30px rgba(0, 0, 0, 0.4),
+      inset 0 0 0 1px rgba(252, 255, 97, 0.5);
+  }
+  .mcard-front-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 0 0 auto;
+  }
+  .mcard-num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    color: rgba(10, 10, 10, 0.42);
+  }
+  .mcard-star { color: var(--accent, #fcff61); font-size: 15px; filter: drop-shadow(0 0 6px rgba(252,255,97,0.6)); }
+  .mcard-name {
+    font-family: var(--font-display);
+    font-size: clamp(20px, 2vw, 30px);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.02;
+    text-transform: uppercase;
+    margin: clamp(10px, 1.1vw, 16px) 0 clamp(7px, 0.7vw, 11px);
+    flex: 0 0 auto;
+  }
+  .mcard-body {
+    font-size: clamp(12px, 0.92vw, 14.5px);
+    line-height: 1.42;
+    color: rgba(10, 10, 10, 0.62);
+    flex: 1 1 auto;          /* fills the remaining card space */
+    margin: 0;
+  }
+  .mcard-sig {
+    margin-top: clamp(8px, 0.8vw, 12px);
+    align-self: flex-start;
+    flex: 0 0 auto;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #0a0a0a;
+    background: var(--accent, #fcff61);
+    padding: 5px 11px;
+    border-radius: 999px;
+  }
+
+  /* Before JS/scroll runs, show fronts (no-JS + reduced-motion friendly). */
+  .mcards:not([data-armed]) .mcard-inner { transform: rotateY(0deg); }
+
+  /* ---- responsive: 4-up → 2-up → 1-up (always same portrait shape) ---- */
+  @media (max-width: 960px) {
+    .mcard { flex: 0 0 calc(50% - 13px); }
+  }
+  @media (max-width: 540px) {
+    .mcards { gap: 16px; }
+    .mcard { flex: 0 0 min(300px, 100%); }
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+  gsap.registerPlugin(ScrollTrigger);
+
+  const container = document.querySelector<HTMLElement>("[data-mcards]");
+  const cards = gsap.utils.toArray<HTMLElement>("[data-mcard]");
+  if (container && cards.length) {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const fan = [-11, -4, 4, 11];
+
+    if (reduce) {
+      container.setAttribute("data-armed", "");
+    } else {
+      let trigger: ScrollTrigger | null = null;
+
+      const build = () => {
+        if (trigger) { trigger.kill(); trigger = null; }
+        gsap.killTweensOf(cards);
+        cards.forEach((c) => gsap.killTweensOf(c.querySelector(".mcard-inner")));
+
+        const cRect = container.getBoundingClientRect();
+        const centreX = cRect.left + cRect.width / 2;
+        const centreY = cRect.top + cRect.height / 2;
+        const offs = cards.map((card) => {
+          const r = card.getBoundingClientRect();
+          return { x: centreX - (r.left + r.width / 2), y: centreY - (r.top + r.height / 2) };
+        });
+
+        container.setAttribute("data-armed", "");
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: container,
+            start: "top 82%",
+            end: "top 32%",
+            scrub: 0.7,
+          },
+        });
+
+        cards.forEach((card, i) => {
+          const inner = card.querySelector(".mcard-inner");
+          gsap.set(card, { x: offs[i].x, y: offs[i].y - 36, rotation: fan[i], zIndex: i });
+          gsap.set(inner, { rotationY: 180 });
+          tl.to(card, { x: 0, y: 0, rotation: 0, ease: "power3.out" }, 0)
+            .to(inner, { rotationY: 0, ease: "power2.inOut", duration: 0.6 }, 0.18 + i * 0.06);
+        });
+        trigger = tl.scrollTrigger ?? null;
+      };
+
+      build();
+      let rt: number;
+      window.addEventListener("resize", () => {
+        clearTimeout(rt);
+        rt = window.setTimeout(build, 200);
+      });
+    }
+  }
+</script>

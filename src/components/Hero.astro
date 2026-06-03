@@ -2,79 +2,132 @@
 interface Props {
   intro: string;
   titleLines: string[];
-  /** Single word inside the final line that should pop in accent yellow. */
   accentWord?: string;
   ctaPrimary: { label: string; href: string };
   ctaSecondary: { label: string; href: string };
 }
-const { intro, titleLines, accentWord, ctaPrimary, ctaSecondary } = Astro.props;
 
-// Find the line containing the accent word so we can wrap just that span.
-function renderLine(line: string) {
-  if (!accentWord || !line.includes(accentWord)) return line;
-  const idx = line.indexOf(accentWord);
-  return {
-    before: line.slice(0, idx),
-    accent: accentWord,
-    after: line.slice(idx + accentWord.length),
-  };
-}
+const { intro, titleLines, ctaPrimary, ctaSecondary } = Astro.props;
 ---
-<header class="hero-bn" data-screen-label="Home">
-  <div class="hero-bn-sticky">
-    <div id="three-container" aria-hidden="true"></div>
-    <div class="hero-vignette" aria-hidden="true"></div>
-    <div class="hero-noise" aria-hidden="true"></div>
+<header class="hero-ed hero-ed--liquid" data-screen-label="Home">
+  {/* Dark scrim over the page's animated water background → white title reads */}
+  <div class="hero-ed-scrim" aria-hidden="true"></div>
 
-    <div class="hero-overlay">
-      <div class="hero-bn-top">
-        <p class="hero-bn-intro">{intro}</p>
-      </div>
-
-      <h1 class="hero-bn-title">
-        {titleLines.map((line) => {
-          const r = renderLine(line);
-          if (typeof r === "string") {
-            return <span class="line">{r}</span>;
-          }
-          return (
-            <span class="line">
-              {r.before}
-              <span class="accent-word">{r.accent}</span>
-              {r.after}
-            </span>
-          );
-        })}
+  <div class="hero-ed-inner">
+    {/* Bottom-anchored: count + title + (CTAs left · description right) + meta */}
+    <div class="hero-ed-bottom">
+      <div class="hero-ed-count">(12+)</div>
+      <h1 class="hero-ed-display">
+        {titleLines.map((line, i) => (
+          <span class="line">{line.toUpperCase()}{i < titleLines.length - 1 ? "" : "."}</span>
+        ))}
       </h1>
 
-      <div class="hero-bn-bottom">
-        <div class="hero-bn-actions">
-          <a href={ctaPrimary.href} class="btn-yellow">{ctaPrimary.label}</a>
-          <a href={ctaSecondary.href} class="btn-line">{ctaSecondary.label}</a>
+      <div class="hero-ed-actions">
+        <div class="hero-ed-ctas">
+          <a class="btn-pill" href={ctaPrimary.href}>{ctaPrimary.label.replace(/→\s*$/, "").trim()}<span class="btn-arrow" aria-hidden="true">→</span></a>
+          <a class="btn-link" href={ctaSecondary.href}>{ctaSecondary.label.replace(/→\s*$/, "").trim()}<span class="btn-arrow" aria-hidden="true">→</span></a>
         </div>
+        <p class="hero-ed-lede">{intro}</p>
+      </div>
+
+      <div class="hero-ed-meta">
+        <span class="hero-ed-ep">EP.12</span>
+        <span class="hero-ed-year">® {new Date().getFullYear()}</span>
       </div>
     </div>
   </div>
 </header>
 
-<script>
-  // Load the heavy three.js island only when the hero is on screen and motion isn't reduced.
-  const container = document.getElementById("three-container");
-  if (container) {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!reduced) {
-      const obs = new IntersectionObserver((entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            obs.disconnect();
-            import("./HeroParticles.client.ts").catch((err) => {
-              console.warn("Hero particles failed to load:", err);
-            });
-            break;
-          }
-        }
-      }, { rootMargin: "200px" });
-      obs.observe(container);
+<style>
+  /* ============================================================
+     LIQUID HERO — transparent so the global water shows through.
+     Content is bottom-anchored; a bottom scrim keeps the white title
+     and description readable, while the nav stays dark over the
+     lighter upper water.
+     ============================================================ */
+  .hero-ed--liquid {
+    position: relative;
+    background: transparent;
+  }
+  .hero-ed-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 30%,
+      rgba(8, 9, 14, 0.48) 52%,
+      rgba(8, 9, 14, 0.92) 100%
+    );
+  }
+  .hero-ed--liquid .hero-ed-inner {
+    position: relative;
+    z-index: 2;
+    justify-content: flex-end;   /* anchor everything to the bottom */
+  }
+
+  /* title — white + a touch smaller */
+  .hero-ed--liquid .hero-ed-display,
+  .hero-ed--liquid .hero-ed-display .line { color: #fff; }
+  .hero-ed--liquid .hero-ed-display {
+    font-size: clamp(44px, 6.8vw, 104px);
+  }
+
+  .hero-ed--liquid .hero-ed-count { color: rgba(255, 255, 255, 0.5); }
+  .hero-ed--liquid .hero-ed-ep,
+  .hero-ed--liquid .hero-ed-year { color: rgba(255, 255, 255, 0.6); }
+
+  /* CTAs (left) + description (bottom-right corner) share a row */
+  .hero-ed--liquid .hero-ed-actions {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 32px;
+    margin-top: clamp(22px, 3vh, 36px);
+  }
+  .hero-ed--liquid .hero-ed-ctas {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin: 0;
+  }
+  .hero-ed--liquid .hero-ed-lede {
+    margin: 0;
+    max-width: clamp(260px, 28vw, 360px);
+    text-align: right;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: clamp(13px, 1vw, 15px);
+    line-height: 1.55;
+  }
+
+  .hero-ed--liquid .btn-pill {
+    background: #fff;
+    color: #0a0a0a;
+    border-color: #fff;
+  }
+  .hero-ed--liquid .btn-pill:hover {
+    background: var(--accent, #fcff61);
+    border-color: var(--accent, #fcff61);
+    color: #0a0a0a;
+  }
+  .hero-ed--liquid .btn-link { color: #fff; }
+  .hero-ed--liquid .btn-link:hover { color: rgba(255, 255, 255, 0.7); }
+
+  /* mobile: stack CTAs then description (left-aligned) */
+  @media (max-width: 800px) {
+    .hero-ed--liquid .hero-ed-actions {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 18px;
+    }
+    .hero-ed--liquid .hero-ed-ctas { width: 100%; }
+    .hero-ed--liquid .hero-ed-lede {
+      text-align: left;
+      max-width: none;
     }
   }
-</script>
+</style>

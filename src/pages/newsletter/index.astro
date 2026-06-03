@@ -1,0 +1,235 @@
+---
+import Base from "~/layouts/Base.astro";
+import { absoluteUrl, localizedPath } from "~/lib/site";
+import { breadcrumb } from "~/lib/schema";
+import { t } from "~/lib/i18n";
+
+const locale = "fr" as const;
+const i = t(locale);
+
+const title = "Rester informé(e) — Newsletter IA mensuelle | Banana Navy";
+const description =
+  "Une fois par mois : notre veille IA et les résultats concrets de nos recherches & développements. Utile, actionnable, zéro spam. Désinscription en un clic.";
+
+const schema = [
+  breadcrumb([
+    { name: "Banana Navy", url: absoluteUrl("/") },
+    { name: "Newsletter", url: absoluteUrl(localizedPath(locale, i.routes.newsletter)) },
+  ]),
+];
+
+const PERKS = [
+  {
+    k: "1× / mois",
+    v: "Un seul envoi mensuel. Pas de flux quotidien, pas de relances.",
+  },
+  {
+    k: "Veille IA utile",
+    v: "Ce qui change vraiment pour les PME — trié, résumé, actionnable.",
+  },
+  {
+    k: "Notre R&D",
+    v: "Les résultats concrets de nos recherches & développements : ce qu'on teste, ce qui marche, ce qu'on en retient.",
+  },
+  {
+    k: "Zéro spam",
+    v: "Pas de vente agressive, pas de revente d'email. Désinscription en un clic.",
+  },
+];
+---
+<Base locale={locale} title={title} description={description} schema={schema}>
+  <section class="section">
+    <div class="container">
+      <div class="nl-grid">
+        {/* ---- Left: pitch ---- */}
+        <div class="nl-copy">
+          <div class="eyebrow mono"><span class="dot"></span>Newsletter · Veille IA mensuelle</div>
+          <h1 class="display h1" style="margin-top: 24px;">
+            Restez informé(e).<br /><span class="h-accent">Sans le bruit.</span>
+          </h1>
+          <p class="body-l" style="color: var(--fg-60); max-width: 56ch; margin-top: 28px;">
+            Une fois par mois, on partage notre veille IA et les résultats concrets de nos
+            recherches & développements. Ce qui marche vraiment, ce qu'on construit, ce qu'on
+            apprend. Pensé pour être <strong>utile et actionnable</strong> — et rien d'autre.
+          </p>
+
+          <ul class="nl-perks">
+            {PERKS.map((p) => (
+              <li>
+                <span class="nl-perk-k">{p.k}</span>
+                <span class="nl-perk-v">{p.v}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* ---- Right: form card ---- */}
+        <aside class="nl-card">
+          <div class="nl-card-title eyebrow mono"><span class="dot"></span>S'inscrire</div>
+
+          <form class="nl-form" action="/api/newsletter" method="post" data-nl-form>
+            <input type="text" name="website" tabindex="-1" autocomplete="off" class="nl-hp" aria-hidden="true" />
+
+            <label>
+              <span>Email</span>
+              <input type="email" name="email" required autocomplete="email" placeholder="vous@entreprise.be" />
+            </label>
+
+            <label class="nl-consent">
+              <input type="checkbox" name="rgpd" required />
+              <span>
+                J'accepte de recevoir la newsletter mensuelle de Banana Navy. Mes données ne
+                sont jamais revendues — désinscription en un clic. (RGPD)
+              </span>
+            </label>
+
+            <button type="submit" class="btn-yellow nl-submit">M'inscrire →</button>
+
+            <p class="nl-micro" data-nl-status>
+              Un email par mois. Zéro spam. Vous pouvez vous désinscrire à tout moment.
+            </p>
+          </form>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .nl-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .nl-grid { grid-template-columns: 1fr; gap: 40px; }
+    }
+
+    .nl-perks {
+      list-style: none;
+      margin: 40px 0 0;
+      padding: 0;
+      display: grid;
+      gap: 0;
+      max-width: 60ch;
+    }
+    .nl-perks li {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 20px;
+      padding: 16px 0;
+      border-top: 1px solid var(--fg-10);
+    }
+    .nl-perks li:last-child { border-bottom: 1px solid var(--fg-10); }
+    @media (max-width: 540px) {
+      .nl-perks li { grid-template-columns: 1fr; gap: 6px; }
+    }
+    .nl-perk-k {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--fg);
+      padding-top: 2px;
+    }
+    .nl-perk-v {
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--fg-60);
+    }
+
+    /* ---- Form card ---- */
+    .nl-card {
+      border: 1px solid var(--fg-20);
+      padding: 28px;
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      position: sticky;
+      top: 96px;
+    }
+    .nl-card-title { margin-bottom: 20px; }
+
+    .nl-form { display: grid; gap: 18px; }
+    .nl-form label {
+      display: grid;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--fg-60);
+    }
+    .nl-form input[type="email"] {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--fg-20);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: 15px;
+      letter-spacing: normal;
+      text-transform: none;
+    }
+    .nl-form input[type="email"]:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .nl-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+    .nl-consent {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      flex-direction: row;
+      text-transform: none;
+      letter-spacing: 0;
+      font-family: var(--font-body);
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--fg-60);
+    }
+    .nl-consent input { width: auto; margin-top: 3px; }
+
+    .nl-submit { width: 100%; justify-content: center; }
+
+    .nl-micro {
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--fg-60);
+      margin-top: 2px;
+    }
+    .nl-form[data-done] .nl-micro { color: var(--fg); font-weight: 600; }
+  </style>
+
+  <script>
+    const form = document.querySelector<HTMLFormElement>("[data-nl-form]");
+    const status = document.querySelector<HTMLElement>("[data-nl-status]");
+    if (form && status) {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = form.querySelector<HTMLButtonElement>("button[type=submit]");
+        if (btn) { btn.disabled = true; btn.textContent = "Inscription…"; }
+        status.textContent = "";
+        try {
+          const res = await fetch("/api/newsletter", {
+            method: "POST",
+            body: new FormData(form),
+            headers: { Accept: "application/json" },
+          });
+          const data = await res.json().catch(() => ({ ok: res.ok }));
+          if (data.ok) {
+            form.setAttribute("data-done", "");
+            form.querySelectorAll("label, .nl-submit").forEach((el) => ((el as HTMLElement).style.display = "none"));
+            status.textContent = "Merci ! Vous êtes inscrit(e). Surveillez votre boîte mail — un email par mois, c'est tout.";
+          } else {
+            throw new Error("failed");
+          }
+        } catch (err) {
+          if (btn) { btn.disabled = false; btn.textContent = "M'inscrire →"; }
+          status.textContent = "Oups — un souci est survenu. Réessayez, ou écrivez-nous directement.";
+        }
+      });
+    }
+  </script>
+</Base>

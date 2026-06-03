@@ -5,17 +5,18 @@
      ============================================================ */
 
   body.press-light {
-    /* Cream/grey palette */
-    --press-bg:      #ece9e1;
-    --press-surface: #f5f3ec;
+    /* High-contrast near-white canvas. The surface tone sits a hair lighter
+       than the body so press cards still read as a slightly raised layer. */
+    --press-bg:      #F4F4F6;
+    --press-surface: #FBFBFC;
     --press-fg:      #0a0a0a;
     --press-fg-60:   rgba(10, 10, 10, 0.62);
     --press-fg-40:   rgba(10, 10, 10, 0.40);
     --press-fg-20:   rgba(10, 10, 10, 0.20);
     --press-fg-10:   rgba(10, 10, 10, 0.10);
     --press-fg-06:   rgba(10, 10, 10, 0.06);
-    --press-active:  #FFD538;            /* brand yellow highlight on active row */
-    --press-yellow:  #FFD538;
+    --press-active:  #fcff61;            /* brand yellow highlight on active row */
+    --press-yellow:  #fcff61;
     background: var(--press-bg);
   }
 

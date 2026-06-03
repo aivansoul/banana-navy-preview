@@ -11,23 +11,76 @@ const i = t(locale);
 const r = i.routes;
 const link = (path: string) => localizedPath(locale, path);
 const year = new Date().getFullYear();
+
+// 10 secondary columns (after the 5 service categories)
+const SECONDARY_COLS = [
+  {
+    label: locale === "fr" ? "Villes" : "Steden",
+    href: link("/locations/"),
+    links: LOCATIONS.map((c) => ({
+      title: c.name[locale],
+      href: link(`/locations/${c.slug}/`),
+    })),
+    listClass: "footer-cities",
+  },
+  {
+    label: i.footer.sections.company,
+    href: link(r.approche),
+    links: [
+      { title: i.nav.approche, href: link(r.approche) },
+      { title: i.nav.equipe,   href: link(r.equipe) },
+      { title: i.nav.lab,      href: link(r.lab) },
+    ],
+  },
+  {
+    label: i.nav.contact,
+    href: link(r.contact),
+    links: [
+      { title: locale === "fr" ? "Réserver un audit" : "Reserveer een audit", href: link(r.contact) },
+      { title: locale === "fr" ? "Coordonnées"       : "Contactgegevens",     href: link(r.contact) + "#coordonnees" },
+      {
+        title: "Google Maps →",
+        href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+          `${SITE.address.street}, ${SITE.address.postalCode} ${SITE.address.city}`,
+        )}`,
+      },
+    ],
+  },
+  {
+    label: i.footer.sections.resources,
+    href: link(r.realisations),
+    links: [
+      { title: i.nav.realisations, href: link(r.realisations) },
+      { title: "FAQ",              href: link(r.faq) },
+      { title: i.footer.legal.llms, href: locale === "fr" ? "/llms.txt" : "/nl/llms.txt" },
+    ],
+  },
+  {
+    label: i.footer.sections.legal,
+    href: link(r.mentions),
+    links: [
+      { title: i.footer.legal.mentions, href: link(r.mentions) },
+      { title: i.footer.legal.privacy,  href: link(r.privacy) },
+      { title: locale === "fr" ? "CGV" : "AV", href: link(r.cgv) },
+    ],
+  },
+];
 ---
 <footer class="footer-bn" id="footer">
   <div class="footer-bn-inner">
-    <div class="footer-bn-top footer-bn-top-wide">
-      <div class="footer-brand-col">
-        <a href={link(r.home)} class="footer-brand" aria-label="Banana Navy">
-          <img
-            src={asset("/banana-navy-logo.svg")}
-            width="110"
-            height="84"
-            alt="Banana Navy"
-            class="bn-logo bn-logo-lg"
-          />
-        </a>
-        <p class="footer-tag">{i.footer.tagline}</p>
-      </div>
 
+    {/* ============ 1. Logo + 10 columns inline (single row) ============ */}
+    <div class="footer-bn-nav">
+      <a href={link(r.home)} class="footer-brand footer-bn-brand" aria-label="Banana Navy">
+        <img
+          src={asset("/banana-navy-logo.svg")}
+          width="110"
+          height="84"
+          alt="Banana Navy"
+          class="bn-logo bn-logo-lg"
+        />
+      </a>
+      {/* 5 service categories — heading links to the category page */}
       {SERVICE_CATEGORIES.map((cat) => (
         <div class="footer-col">
           <h5><a href={link(`/${cat.slug}/`)}>{cat.head}</a></h5>
@@ -40,122 +93,260 @@ const year = new Date().getFullYear();
           </ul>
         </div>
       ))}
+
+      {/* 5 secondary columns — Villes / Entreprise / Contact / Ressources / Légal */}
+      {SECONDARY_COLS.map((col) => (
+        <div class="footer-col">
+          <h5><a href={col.href}>{col.label}</a></h5>
+          <ul class={col.listClass ?? ""}>
+            {col.links.map((l) => (
+              <li><a href={l.href}>{l.title}</a></li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
 
-    <div class="footer-bn-top footer-bn-secondary">
-      <div class="footer-col footer-col-wide">
-        <h5><a href={link((i.routes as any).locations || "/locations/")}>{locale === "fr" ? "Villes" : "Steden"}</a></h5>
-        <ul class="footer-cities">
-          {LOCATIONS.map((c) => (
-            <li>
-              <a href={link(`/locations/${c.slug}/`)}>{c.name[locale]}</a>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h5>{i.footer.sections.company}</h5>
-        <ul>
-          <li><a href={link(r.approche)}>{i.nav.approche}</a></li>
-          <li><a href={link(r.equipe)}>{i.nav.equipe}</a></li>
-          <li><a href={link(r.lab)}>{i.nav.lab}</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h5>{i.footer.sections.resources}</h5>
-        <ul>
-          <li><a href={link(r.realisations)}>{i.nav.realisations}</a></li>
-          <li><a href={link(r.faq)}>FAQ</a></li>
-          <li><a href={link(r.contact)}>{i.nav.contact}</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h5>{i.footer.sections.legal}</h5>
-        <ul>
-          <li><a href={link(r.mentions)}>{i.footer.legal.mentions}</a></li>
-          <li><a href={link(r.privacy)}>{i.footer.legal.privacy}</a></li>
-          <li><a href={link(r.cgv)}>{locale === "fr" ? "CGV" : "AV"}</a></li>
-          <li>
-            <a href={locale === "fr" ? "/llms.txt" : "/nl/llms.txt"}>
-              {i.footer.legal.llms}
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-
+    {/* ============ 3. Compact meta strip ============ */}
     <div class="footer-bn-meta">
       <span>
-        {SITE.legalName} · {SITE.address.street} · {SITE.address.postalCode}{" "}
-        {SITE.address.city}, {SITE.address.countryName}
+        © {year} {SITE.legalName} · {i.footer.rights} · TVA {SITE.vatNumber}
       </span>
       <span>
-        TVA {SITE.vatNumber} ·{" "}
-        <a
-          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-            `${SITE.address.street}, ${SITE.address.postalCode} ${SITE.address.city}`,
-          )}`}
-          rel="noopener"
-        >
-          Google Maps →
-        </a>
+        {SITE.address.street} · {SITE.address.postalCode} {SITE.address.city}, {SITE.address.countryName}
       </span>
-      <span>© {year} {SITE.brandName} · {i.footer.rights}</span>
     </div>
   </div>
 </footer>
 
 <style>
-  /* New wide footer: brand + 5 service category columns on one row */
-  .footer-bn-top-wide {
+  /* ============================================================
+     COMPACT FOOTER — single row of 10 column headings
+     ============================================================ */
+  .footer-bn {
+    /* Override the global 80px padding for a compact footer */
+    padding: 36px var(--pad-x, 32px) 24px;
+  }
+  .footer-bn-inner {
+    padding: 0;
+  }
+
+  /* ----- Single inline row — logo + 10 column headings ----- */
+  .footer-bn-nav {
     display: grid;
-    grid-template-columns: 1.4fr repeat(5, 1fr);
-    gap: 32px;
-    align-items: start;
+    /* logo cell + 10 column cells, vertically centered */
+    grid-template-columns: auto repeat(10, minmax(0, 1fr));
+    gap: 18px;
+    align-items: center;
+    margin-bottom: 24px;
   }
-  .footer-brand-col {
-    grid-column: 1;
+  .footer-bn-brand {
+    display: inline-flex;
+    align-items: center;
+    margin: 0;                   /* override default footer-brand spacing */
+    padding-right: 12px;
   }
-  .footer-bn-secondary {
-    display: grid;
-    grid-template-columns: 2fr repeat(3, 1fr);
-    gap: 32px;
-    margin-top: 48px;
-    padding-top: 32px;
-    border-top: 1px solid var(--fg-10);
+  .footer-bn-brand .bn-logo-lg {
+    height: 44px;                /* compact, sits inline with the headings */
   }
-  .footer-cities {
+  .footer-bn-nav .footer-col h5 {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0;
+    cursor: pointer;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.2;
+    color: var(--fg-60);
+    transition: color 0.2s ease;
+  }
+  .footer-bn-nav .footer-col h5 a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .footer-bn-nav .footer-col h5::after {
+    content: "→";
+    font-size: 0.85em;
+    opacity: 0.35;
+    transition: transform 0.3s ease, opacity 0.2s ease;
+    display: inline-block;
+  }
+  /* Active state: just ink darkens + chevron slides */
+  .footer-bn-nav .footer-col:hover h5,
+  .footer-bn-nav .footer-col:focus-within h5,
+  .footer-bn-nav .footer-col[data-open] h5 {
+    color: var(--fg);
+  }
+  .footer-bn-nav .footer-col:hover h5::after,
+  .footer-bn-nav .footer-col:focus-within h5::after,
+  .footer-bn-nav .footer-col[data-open] h5::after {
+    transform: translateX(4px);
+    opacity: 0.85;
+  }
+
+  /* Plain dropdown menus — links drop straight down beneath the heading.
+     No card chrome (no border / shadow / radius); the panel is flush with
+     the footer background. SEO-safe: links stay in the DOM (just absolutely
+     positioned + opacity hidden by default). */
+  .footer-bn-nav .footer-col {
+    position: relative;
+  }
+  .footer-bn-nav .footer-col h5 {
+    position: relative;
+    z-index: 2;
+  }
+
+  .footer-bn-nav .footer-col ul {
+    display: none;                 /* no roll-out menus — titles are plain links */
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    min-width: 180px;
+    width: max-content;
+    max-width: calc(100vw - 60px);
+    background: var(--bg);
+    padding: 0;
+    list-style: none;
+    margin: 0;
+    z-index: 30;
+
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-8px);
+    transition:
+      opacity 0.3s ease,
+      transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .footer-bn-nav .footer-col:hover ul,
+  .footer-bn-nav .footer-col:focus-within ul,
+  .footer-bn-nav .footer-col[data-open] ul {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .footer-bn-nav .footer-col ul li {
+    list-style: none;
+    margin: 0;
+  }
+  .footer-bn-nav .footer-col ul li a {
+    display: block;
+    padding: 5px 0;
+    font-size: 13px;
+    color: var(--fg-60);
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+  .footer-bn-nav .footer-col ul li a:hover {
+    color: var(--fg);
+    transform: translateX(2px);
+  }
+
+  /* Villes panel uses a 2-column grid layout (it has 10 cities) */
+  .footer-bn-nav .footer-cities {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 4px 16px;
+    gap: 2px 14px;
+    min-width: 260px;
   }
-  .footer-cities li { display: block; }
-  .footer-cities a {
-    font-size: 12px;
+
+  /* Rightmost columns: anchor the dropdown to the right edge so it doesn't
+     overflow the viewport. */
+  .footer-bn-nav .footer-col:nth-last-child(-n+3) ul {
+    left: auto;
+    right: 0;
+  }
+
+  /* ----- Compact meta strip ----- */
+  .footer-bn-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--fg-10);
+    font-size: 11px;
     color: var(--fg-60);
-    display: block;
-    padding: 3px 0;
-    transition: color 0.15s ease;
+    letter-spacing: 0.04em;
+    transition: opacity 0.25s ease;
   }
-  .footer-cities a:hover { color: var(--accent); }
-  @media (max-width: 1100px) {
-    .footer-bn-top-wide {
-      grid-template-columns: 1fr 1fr 1fr;
+
+  /* ----- Responsive ----- */
+  @media (max-width: 1280px) {
+    .footer-bn-nav {
+      grid-template-columns: auto repeat(5, 1fr);
+      row-gap: 16px;
     }
-    .footer-brand-col { grid-column: 1 / -1; }
+    /* The 5 secondary cols wrap to a second row of 5 */
+    .footer-bn-brand { grid-row: span 2; }
   }
-  @media (max-width: 700px) {
-    .footer-bn-top-wide,
-    .footer-bn-secondary {
-      grid-template-columns: 1fr 1fr;
+  @media (max-width: 900px) {
+    .footer-bn-nav {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px 20px;
     }
-    .footer-col-wide { grid-column: 1 / -1; }
+    .footer-bn-brand {
+      grid-column: 1 / -1;
+      grid-row: auto;
+      padding-right: 0;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--fg-10);
+      width: 100%;
+    }
+    .footer-bn-brand .bn-logo-lg { height: 40px; }
+
+    /* On mobile drop the floating-card pattern and fall back to a normal
+       inline accordion (no overflow risk on a narrow screen). */
+    .footer-bn-nav .footer-col ul,
+    .footer-bn-nav .footer-col:nth-last-child(-n+3) ul {
+      position: relative;
+      top: auto;
+      left: auto;
+      right: auto;
+      width: 100%;
+      min-width: 0;
+      max-width: none;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 0;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transform: none;
+      transition: max-height 0.4s ease, opacity 0.3s ease, padding 0.3s ease;
+    }
+    .footer-bn-nav .footer-col:hover ul,
+    .footer-bn-nav .footer-col:focus-within ul,
+    .footer-bn-nav .footer-col[data-open] ul,
+    .footer-bn-nav .footer-col:nth-last-child(-n+3):hover ul,
+    .footer-bn-nav .footer-col:nth-last-child(-n+3):focus-within ul,
+    .footer-bn-nav .footer-col:nth-last-child(-n+3)[data-open] ul {
+      max-height: 1000px;
+      opacity: 1;
+      padding-top: 10px;
+      transform: none;
+    }
+    .footer-bn-nav .footer-col h5 a {
+      background: transparent;
+      padding: 0;
+      margin: 0;
+    }
   }
-  .footer-col h5 a {
-    color: inherit;
-    transition: color 0.15s ease;
+  @media (max-width: 480px) {
+    .footer-bn-nav { grid-template-columns: 1fr 1fr; }
+    .footer-bn-meta { font-size: 10px; }
   }
-  .footer-col h5 a:hover {
-    color: var(--accent);
+
+  @media (prefers-reduced-motion: reduce) {
+    .footer-bn-nav .footer-col ul,
+    .footer-bn-nav .footer-col ul li,
+    .footer-bn-nav .footer-col h5::after {
+      transition: none !important;
+    }
   }
 </style>
+

@@ -1,0 +1,375 @@
+---
+/**
+ * WaterBackground.astro — full-page liquid-ripple background.
+ *
+ * A single fixed, full-viewport WebGL canvas behind all page content. The wave
+ * sim (ping-pong HalfFloat targets) refracts a soft procedural "water" texture
+ * with a specular sheen; ripples follow the cursor anywhere on the page and a
+ * slow idle drift keeps it alive.
+ *
+ * Owns window.__bnFluid so the Design Studio panel drives it live. Mount it on a
+ * page and make that page's section backgrounds transparent to reveal it.
+ */
+---
+
+<canvas class="bn-water" data-bn-water aria-hidden="true"></canvas>
+
+<style>
+  .bn-water {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;            /* behind all page content */
+    display: block;
+    pointer-events: none;   /* never blocks clicks */
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+  .bn-water[data-ready] { opacity: 1; }
+</style>
+
+<script>
+  import * as THREE from "three";
+
+  (() => {
+    const canvas = document.querySelector<HTMLCanvasElement>("[data-bn-water]");
+    if (!canvas) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Live, persisted parameters (the Design Studio panel drives these).
+    const STORE_KEY = "bn-design-studio";
+    const loadFluid = () => {
+      try {
+        return (JSON.parse(localStorage.getItem(STORE_KEY) || "{}").fluid) || {};
+      } catch (e) {
+        return {};
+      }
+    };
+    const params = Object.assign(
+      {
+        intensity: 1.0,
+        viscosity: 0.972,
+        refraction: 0.16,
+        specular: 0.7,
+        ambientSpeed: 1.0,
+        texture: "Clear water",
+      },
+      loadFluid(),
+    );
+
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: true,
+        premultipliedAlpha: false,
+        preserveDrawingBuffer: true,
+      });
+    } catch (e) {
+      return;
+    }
+
+    const gl = renderer.getContext();
+    const canFloat = renderer.capabilities.isWebGL2
+      ? !!gl.getExtension("EXT_color_buffer_float")
+      : !!gl.getExtension("OES_texture_half_float");
+    if (!canFloat) {
+      renderer.dispose();
+      return;
+    }
+
+    renderer.setClearColor(0x000000, 0);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    renderer.setPixelRatio(dpr);
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+    // ---- ping-pong simulation targets ----
+    const SIM = 512;
+    const rtOpts = {
+      type: THREE.HalfFloatType,
+      minFilter: THREE.LinearFilter,
+      magFilter: THREE.LinearFilter,
+      format: THREE.RGBAFormat,
+      depthBuffer: false,
+      stencilBuffer: false,
+    };
+    let rtA = new THREE.WebGLRenderTarget(SIM, SIM, rtOpts);
+    let rtB = new THREE.WebGLRenderTarget(SIM, SIM, rtOpts);
+
+    // ---- procedural "water" textures (selectable presets) ----
+    // [cx, cy, radius, "r,g,b", alpha]. "Clear water" / "Mono soft" stay light so
+    // page text remains legible; the darker presets are dramatic accents.
+    const TEXTURE_PRESETS: Record<string, { base: string; centre: number; blobs: [number, number, number, string, number][] }> = {
+      "Clear water": {
+        base: "#F1F3F6", centre: 0.5,
+        blobs: [
+          [240, 280, 560, "120,140,180", 0.14], [820, 220, 540, "130,150,190", 0.12],
+          [200, 820, 560, "120,140,180", 0.13], [860, 860, 560, "130,150,190", 0.13],
+          [512, 1010, 560, "110,130,175", 0.12], [512, 20, 520, "130,150,190", 0.1],
+        ],
+      },
+      "Mono soft": {
+        base: "#F4F4F6", centre: 0.45,
+        blobs: [
+          [200, 240, 500, "60,62,70", 0.2], [860, 200, 520, "60,62,70", 0.16],
+          [180, 860, 500, "60,62,70", 0.18], [880, 880, 520, "60,62,70", 0.18],
+          [512, 1010, 560, "60,62,70", 0.15],
+        ],
+      },
+      "Navy ink": {
+        base: "#F4F4F6", centre: 0.9,
+        blobs: [
+          [150, 200, 430, "26,28,34", 0.55], [900, 150, 470, "20,28,58", 0.42],
+          [160, 880, 450, "26,28,34", 0.5], [890, 900, 500, "20,28,58", 0.5],
+          [512, 1010, 540, "26,28,34", 0.42], [512, 30, 430, "26,28,34", 0.34],
+          [980, 540, 320, "252,255,97", 0.16],
+        ],
+      },
+      "Aurora": {
+        base: "#F4F4F6", centre: 0.85,
+        blobs: [
+          [180, 220, 460, "18,26,60", 0.5], [880, 170, 470, "16,80,90", 0.34],
+          [170, 860, 470, "60,24,80", 0.4], [900, 900, 500, "18,26,60", 0.46],
+          [512, 1010, 540, "16,70,80", 0.32], [300, 520, 300, "60,24,80", 0.22],
+          [980, 520, 320, "252,255,97", 0.18],
+        ],
+      },
+      "Warm sand": {
+        base: "#F5F3EF", centre: 0.85,
+        blobs: [
+          [160, 210, 450, "40,34,28", 0.45], [900, 160, 470, "60,50,40", 0.36],
+          [160, 880, 460, "40,34,28", 0.44], [890, 900, 500, "55,46,38", 0.44],
+          [512, 1010, 540, "40,34,28", 0.4], [980, 520, 320, "230,170,60", 0.16],
+        ],
+      },
+    };
+    const TEXTURE_NAMES = Object.keys(TEXTURE_PRESETS);
+    const hexToRgb = (hex: string) => {
+      const h = hex.replace("#", "");
+      const f = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+      const n = parseInt(f, 16);
+      return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+    };
+    function makeTexture(name: string) {
+      const preset = TEXTURE_PRESETS[name] || TEXTURE_PRESETS["Clear water"];
+      const c = document.createElement("canvas");
+      c.width = 1024;
+      c.height = 1024;
+      const x = c.getContext("2d")!;
+      x.fillStyle = preset.base;
+      x.fillRect(0, 0, 1024, 1024);
+      const blob = (cx: number, cy: number, r: number, rgb: string, a: number) => {
+        const g = x.createRadialGradient(cx, cy, 0, cx, cy, r);
+        g.addColorStop(0, `rgba(${rgb},${a})`);
+        g.addColorStop(1, `rgba(${rgb},0)`);
+        x.fillStyle = g;
+        x.fillRect(0, 0, 1024, 1024);
+      };
+      preset.blobs.forEach((b) => blob(b[0], b[1], b[2], b[3], b[4]));
+      // re-lighten the centre band so content over it stays legible
+      const { r, g, b } = hexToRgb(preset.base);
+      const cg = x.createRadialGradient(512, 470, 0, 512, 470, 620);
+      cg.addColorStop(0, `rgba(${r},${g},${b},${preset.centre})`);
+      cg.addColorStop(1, `rgba(${r},${g},${b},0)`);
+      x.fillStyle = cg;
+      x.fillRect(0, 0, 1024, 1024);
+      const tex = new THREE.CanvasTexture(c);
+      tex.minFilter = THREE.LinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+    let waterTex = makeTexture(params.texture);
+
+    // ---- wave-equation simulation shader ----
+    const simMat = new THREE.ShaderMaterial({
+      uniforms: {
+        uTexture: { value: null },
+        uResolution: { value: new THREE.Vector2(SIM, SIM) },
+        uPointer: { value: new THREE.Vector2(-1, -1) },
+        uPointerActive: { value: 0 },
+        uRadius: { value: 0.04 },
+        uIntensity: { value: params.intensity },
+        uViscosity: { value: params.viscosity },
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main(){ vUv = uv; gl_Position = vec4(position, 1.0); }`,
+      fragmentShader: `
+        uniform sampler2D uTexture;
+        uniform vec2 uResolution;
+        uniform vec2 uPointer;
+        uniform float uPointerActive;
+        uniform float uRadius;
+        uniform float uIntensity;
+        uniform float uViscosity;
+        varying vec2 vUv;
+        void main(){
+          vec2 texel = 1.0 / uResolution;
+          vec4 data = texture2D(uTexture, vUv);
+          float current = data.r;
+          float previous = data.g;
+          float top    = texture2D(uTexture, vUv + vec2(0.0, texel.y)).r;
+          float bottom = texture2D(uTexture, vUv - vec2(0.0, texel.y)).r;
+          float left   = texture2D(uTexture, vUv - vec2(texel.x, 0.0)).r;
+          float right  = texture2D(uTexture, vUv + vec2(texel.x, 0.0)).r;
+          float next = (top + bottom + left + right) * 0.5 - previous;
+          next *= uViscosity;
+          if (uPointerActive > 0.5){
+            float dist = length(vUv - uPointer);
+            if (dist < uRadius){
+              next += smoothstep(uRadius, 0.0, dist) * uIntensity * 0.1;
+            }
+          }
+          gl_FragColor = vec4(next, current, 0.0, 1.0);
+        }`,
+    });
+    const simScene = new THREE.Scene();
+    simScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), simMat));
+
+    // ---- display shader: refraction + specular ----
+    const dispMat = new THREE.ShaderMaterial({
+      uniforms: {
+        uHeightmap: { value: null },
+        uImage: { value: waterTex },
+        uResolution: { value: new THREE.Vector2(1, 1) },
+        uRefraction: { value: params.refraction },
+        uSpecular: { value: params.specular },
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main(){ vUv = uv; gl_Position = vec4(position, 1.0); }`,
+      fragmentShader: `
+        uniform sampler2D uHeightmap;
+        uniform sampler2D uImage;
+        uniform vec2 uResolution;
+        uniform float uRefraction;
+        uniform float uSpecular;
+        varying vec2 vUv;
+        void main(){
+          vec2 texel = 1.0 / uResolution;
+          float h  = texture2D(uHeightmap, vUv).r;
+          float hR = texture2D(uHeightmap, vUv + vec2(texel.x, 0.0)).r;
+          float hT = texture2D(uHeightmap, vUv + vec2(0.0, texel.y)).r;
+          vec3 normal = normalize(vec3(hR - h, hT - h, 0.15));
+          vec2 rUv = vUv - normal.xy * uRefraction;
+          vec3 color = texture2D(uImage, rUv).rgb;
+          vec3 lightDir = normalize(vec3(1.0, 1.0, 2.0));
+          float spec = pow(max(dot(normal, lightDir), 0.0), 40.0) * uSpecular;
+          color += spec;
+          gl_FragColor = vec4(color, 1.0);
+        }`,
+    });
+    const scene = new THREE.Scene();
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), dispMat));
+
+    // ---- sizing (full viewport) ----
+    function resize() {
+      const w = Math.max(1, canvas.clientWidth);
+      const h = Math.max(1, canvas.clientHeight);
+      renderer.setSize(w, h, false);
+      dispMat.uniforms.uResolution.value.set(w * dpr, h * dpr);
+    }
+    resize();
+
+    // ---- pointer anywhere on the page ----
+    const ptr = { x: -1, y: -1, active: false, idle: 0 };
+    const onMove = (e: PointerEvent) => {
+      ptr.x = e.clientX / window.innerWidth;
+      ptr.y = 1.0 - e.clientY / window.innerHeight;
+      ptr.active = true;
+      ptr.idle = 0;
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+
+    // ---- loop ----
+    let time = 0;
+    let raf = 0;
+    let running = false;
+
+    const renderDisplay = () => {
+      renderer.setRenderTarget(null);
+      dispMat.uniforms.uHeightmap.value = rtA.texture;
+      renderer.render(scene, camera);
+    };
+
+    const frame = () => {
+      if (!running) return;
+      raf = requestAnimationFrame(frame);
+      time += 1;
+
+      simMat.uniforms.uViscosity.value = params.viscosity;
+      dispMat.uniforms.uRefraction.value = params.refraction;
+      dispMat.uniforms.uSpecular.value = params.specular;
+
+      let px = ptr.x;
+      let py = ptr.y;
+      let intensity = params.intensity;
+      let radius = 0.04;
+      let active = ptr.active;
+      ptr.idle += 1;
+      if (ptr.active && ptr.idle > 22) ptr.active = false;
+      if (!active) {
+        const a = time * 0.006 * params.ambientSpeed;
+        px = 0.5 + Math.cos(a * 1.3) * 0.36;
+        py = 0.5 + Math.sin(a) * 0.32;
+        intensity = params.intensity * 0.5;
+        radius = 0.05;
+        active = true;
+      }
+      simMat.uniforms.uPointer.value.set(px, py);
+      simMat.uniforms.uPointerActive.value = active ? 1.0 : 0.0;
+      simMat.uniforms.uIntensity.value = intensity;
+      simMat.uniforms.uRadius.value = radius;
+
+      simMat.uniforms.uTexture.value = rtA.texture;
+      renderer.setRenderTarget(rtB);
+      renderer.render(simScene, camera);
+      const tmp = rtA;
+      rtA = rtB;
+      rtB = tmp;
+
+      renderDisplay();
+    };
+
+    const start = () => {
+      if (running) return;
+      canvas.setAttribute("data-ready", "");
+      if (reduce) {
+        renderDisplay();
+        return;
+      }
+      running = true;
+      raf = requestAnimationFrame(frame);
+    };
+    const stop = () => {
+      running = false;
+      cancelAnimationFrame(raf);
+    };
+
+    start();
+    document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+    window.addEventListener("resize", resize);
+
+    // ---- live API for the Design Studio panel ----
+    const setTexture = (name: string) => {
+      const t = makeTexture(name);
+      dispMat.uniforms.uImage.value = t;
+      if (waterTex) waterTex.dispose();
+      waterTex = t;
+      params.texture = name;
+    };
+    (window as any).__bnFluid = {
+      params,
+      textures: TEXTURE_NAMES,
+      setParam: (k: string, v: number) => {
+        if (k in params) (params as any)[k] = v;
+      },
+      setTexture,
+      getParams: () => Object.assign({}, params),
+    };
+    window.dispatchEvent(new CustomEvent("bn-fluid-ready"));
+  })();
+</script>

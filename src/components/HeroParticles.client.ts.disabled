@@ -29,7 +29,7 @@ export function mountHeroParticles(container: HTMLElement) {
   camera.position.set(0, 0, 5.6);
 
   scene.add(new THREE.AmbientLight(0xc8d8f0, 2.6));
-  const keyLight = new THREE.PointLight(0xffd538, 14, 50);
+  const keyLight = new THREE.PointLight(0xfcff61, 14, 50);
   keyLight.position.set(3, 3, 4);
   scene.add(keyLight);
   const fillLight = new THREE.PointLight(0x7b9fd4, 8, 50);

@@ -1,15 +1,36 @@
 ---
+import { asset } from "~/lib/site";
+
+interface Client {
+  name: string;
+  logo?: string;
+  logoHeight?: number;
+}
+
 interface Props {
   label: string;
-  clients: string[];
+  clients: Client[];
 }
 const { label, clients } = Astro.props;
-// Duplicate visually for the marquee. The aria-hidden copy is also hidden
-// from the markdown mirror walker so AI fetchers don't see the brand list twice.
-const dup = [...clients, ...clients];
 ---
 <section class="trust" aria-label="Clients">
-  <div class="container" style="margin-bottom: 20px;">
+  {/* Animated liquid displacement — ripples the logo row like it's underwater */}
+  <svg class="trust-liquid-defs" aria-hidden="true" width="0" height="0">
+    <defs>
+      <filter id="trust-liquid" x="-6%" y="-40%" width="112%" height="180%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.009 0.018" numOctaves="2" seed="7" result="noise">
+          <animate attributeName="baseFrequency"
+                   dur="17s" repeatCount="indefinite"
+                   calcMode="spline" keyTimes="0;0.5;1"
+                   keySplines="0.45 0 0.55 1;0.45 0 0.55 1"
+                   values="0.009 0.016;0.014 0.024;0.009 0.016" />
+        </feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="15"
+                           xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
+  <div class="container" style="margin-bottom: 10px;">
     <div class="eyebrow mono" style="display:flex;gap:12px;align-items:center;justify-content:center;">
       <span style="width:6px;height:6px;background:var(--accent);"></span>
       {label}
@@ -17,22 +38,60 @@ const dup = [...clients, ...clients];
   </div>
   <div class="trust-marquee">
     <div class="trust-track" style="--marquee-dur: 80s;">
-      <span>
-        {clients.map((name, i) => (
-          <>
-            {name}
-            {i < clients.length - 1 && <span class="dot-sep"></span>}
-          </>
+      <span class="trust-items">
+        {clients.map((c) => (
+          <span class="trust-item">
+            {c.logo
+              ? <img src={asset(c.logo)} alt={c.name} class="trust-logo" width="120" height="40" style={c.logoHeight ? `height:${c.logoHeight}px` : undefined} />
+              : <span class="trust-name">{c.name}</span>
+            }
+          </span>
         ))}
       </span>
-      <span aria-hidden="true" data-mirror-skip>
-        {clients.map((name, i) => (
-          <>
-            {name}
-            {i < clients.length - 1 && <span class="dot-sep"></span>}
-          </>
+      <span class="trust-items" aria-hidden="true" data-mirror-skip>
+        {clients.map((c) => (
+          <span class="trust-item">
+            {c.logo
+              ? <img src={asset(c.logo)} alt={c.name} class="trust-logo" width="120" height="40" style={c.logoHeight ? `height:${c.logoHeight}px` : undefined} />
+              : <span class="trust-name">{c.name}</span>
+            }
+          </span>
         ))}
       </span>
     </div>
   </div>
 </section>
+
+<style>
+  .trust-liquid-defs { position: absolute; width: 0; height: 0; pointer-events: none; }
+  .trust-items {
+    display: inline-flex;
+    align-items: center;
+    gap: 56px;
+    padding-right: 56px;
+  }
+  .trust-item {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .trust-logo {
+    height: 44px;
+    width: auto;
+    max-width: 220px;
+    object-fit: contain;
+    background: transparent;
+    filter: grayscale(1) opacity(0.62);
+    transition: filter 0.3s ease;
+    display: block;
+  }
+  .trust-logo:hover { filter: grayscale(0) opacity(1); }
+  .trust-name {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(10, 10, 10, 0.55);
+  }
+</style>

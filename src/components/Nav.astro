@@ -12,34 +12,29 @@ const i = t(locale);
 const r = i.routes;
 const link = (path: string) => localizedPath(locale, path);
 ---
-<nav class="nav-bn" aria-label="Primary">
-  <a href={link(r.home)} class="nav-bn-brand" aria-label="Banana Navy">
-    <img
-      src={asset("/banana-navy-logo.svg")}
-      width="110"
-      height="66"
-      alt="Banana Navy"
-      class="bn-logo"
-    />
-  </a>
+<nav class="nav-ed" aria-label="Primary">
+  <div class="nav-ed-left">
+    <a href={link(r.home)} class="nav-ed-brand" aria-label="Banana Navy">
+      <img src={asset("/banana-navy-logo.svg")} alt="Banana Navy" class="nav-ed-brand-logo" width="120" height="72" />
+    </a>
+    <span class="nav-ed-rule" aria-hidden="true"></span>
+    <span class="nav-ed-tagline">AI Integration &amp; Automation</span>
+  </div>
 
-  <div class="nav-bn-links">
-    <details class="nav-mega">
-      <summary class="nav-bn-link-style">{i.nav.capabilities}</summary>
-      <div class="nav-mega-panel" role="menu">
-        <ul class="nav-mega-list">
+  <div class="nav-ed-center">
+    <details class="nav-ed-mega">
+      <summary class="nav-ed-link">{i.nav.capabilities}</summary>
+      <div class="nav-ed-mega-panel" role="menu">
+        <ul class="nav-ed-mega-list">
           {SERVICE_CATEGORIES.map((cat) => (
-            <li class="nav-mega-cat">
-              <a class="nav-mega-cat-link" href={link(`/${cat.slug}/`)} role="menuitem">
-                <span class="nav-mega-cat-head">{cat.head}</span>
-                <span class="nav-mega-cat-arrow" aria-hidden="true">→</span>
+            <li>
+              <a class="nav-ed-mega-head" href={link(`/${cat.slug}/`)} role="menuitem">
+                {cat.head}
               </a>
-              <ul class="nav-mega-leaves" role="menu">
+              <ul class="nav-ed-mega-leaves" role="menu">
                 {cat.leaves.map((leaf) => (
                   <li>
-                    <a href={link(`/${cat.slug}/${leaf.slug}/`)} role="menuitem">
-                      {leaf.name[locale]}
-                    </a>
+                    <a href={link(`/${cat.slug}/${leaf.slug}/`)} role="menuitem">{leaf.name[locale]}</a>
                   </li>
                 ))}
               </ul>
@@ -48,237 +43,355 @@ const link = (path: string) => localizedPath(locale, path);
         </ul>
       </div>
     </details>
-
-    <a href={link(r.realisations)}>{i.nav.realisations}</a>
-    <a href={link(r.approche)}>{i.nav.approche}</a>
-    <a href={link(r.lab)}>{i.nav.lab}</a>
-    <a href={link(r.equipe)}>{i.nav.equipe}</a>
+    <span class="nav-ed-sep" aria-hidden="true">/</span>
+    <a class="nav-ed-link" href={link(r.approche)}>{i.nav.approche}</a>
+    <span class="nav-ed-sep" aria-hidden="true">/</span>
+    <a class="nav-ed-link" href={link(r.lab)}>{i.nav.lab}</a>
+    <span class="nav-ed-sep" aria-hidden="true">/</span>
+    <a class="nav-ed-link" href={link(r.equipe)}>{i.nav.equipe}</a>
   </div>
 
-  <div class="nav-bn-tail">
+  <div class="nav-ed-right">
     <LangSwitcher locale={locale} />
-    <a href={link(r.contact)} class="nav-bn-cta">{i.nav.audit_cta}</a>
+    <a class="nav-ed-cta nav-ed-cta--pill" href={link(r.contact)}>
+      <span>Contacter le Lab</span><span class="nav-ed-cta-arrow" aria-hidden="true">→</span>
+    </a>
   </div>
 </nav>
 
 <style>
-  .nav-bn-tail {
+  /* ============================================================
+     EDITORIAL NAV — magazine-cover style header
+     Brand left · live clock · slash-separated nav · underlined CTA
+     ============================================================ */
+  .nav-ed {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 50;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 32px;
+    padding: 20px 32px;
+    color: #fff;
+    /* discrete semi-transparent glass bar */
+    background: rgba(12, 14, 20, 0.26);
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    transition: background 0.3s ease, border-color 0.3s ease;
+    pointer-events: none;
+  }
+  .nav-ed > * { pointer-events: auto; }
+
+  .nav-ed-left,
+  .nav-ed-right,
+  .nav-ed-center {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 24px;
   }
+  .nav-ed-left { justify-self: start; }
+  .nav-ed-center { justify-self: center; gap: 14px; }
+  .nav-ed-right { justify-self: end; }
 
-  /* Mega-menu — uses native <details>/<summary> so it works without JS */
-  .nav-mega {
-    position: relative;
-  }
-  /* Match the other nav links: mono, uppercase, fg-60 color */
-  .nav-mega > summary.nav-bn-link-style {
-    list-style: none;
-    cursor: pointer;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.14em;
+  .nav-ed-brand {
+    font-family: var(--font-display, "Inter Tight", "Inter", system-ui);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    color: #fff;
+    text-decoration: none;
     text-transform: uppercase;
-    color: var(--fg-60);
-    padding: 4px 0;
-    user-select: none;
-    transition: color 0.3s ease;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    line-height: 0;
   }
-  .nav-mega > summary.nav-bn-link-style:hover { color: var(--fg); }
-  .nav-mega > summary::-webkit-details-marker { display: none; }
-  .nav-mega > summary::after {
-    content: "↓";
-    opacity: 0.55;
-    font-size: 0.9em;
-    margin-left: 2px;
+  .nav-ed-brand-logo {
+    height: 40px;
+    width: auto;
+    display: block;
+    background: transparent !important; /* override base img fallback */
+    border: 0;
+    outline: none;
+    /* SVG ships as solid black — invert to white for contrast over the dark hero video */
+    filter: brightness(0) invert(1);
+    transition: filter 0.2s ease;
   }
-  .nav-mega[open] > summary::after {
-    content: "↑";
+  .nav-ed-brand,
+  .nav-ed-brand:focus,
+  .nav-ed-brand:focus-visible { outline: none; background: transparent; }
+  .nav-ed-brand:hover .nav-ed-brand-logo { opacity: 0.8; }
+  .nav-ed-clock {
+    font-family: var(--font-display, "Inter Tight", "Inter", system-ui);
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.78);
+    font-variant-numeric: tabular-nums;
   }
-
-  .nav-mega-panel {
-    position: absolute;
-    top: calc(100% + 12px);
-    left: 0;
-    width: 280px;
+  .nav-ed-rule {
+    display: inline-block;
+    width: 1px;
+    height: 22px;
+    background: rgba(10, 10, 10, 0.32);
+  }
+  .nav-ed-tagline {
+    font-family: var(--font-display, "Inter Tight", "Inter", system-ui);
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(10, 10, 10, 0.72);
+    white-space: nowrap;
+  }
+  .nav-ed-link {
+    font-family: var(--font-display, "Inter Tight", "Inter", system-ui);
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    color: #fff;
+    text-decoration: none;
+    text-transform: uppercase;
+    cursor: pointer;
+    list-style: none;
+    transition: opacity 0.2s ease;
+  }
+  .nav-ed-link::-webkit-details-marker { display: none; }
+  .nav-ed-link:hover { opacity: 0.65; }
+  .nav-ed-sep {
+    font-family: var(--font-display, "Inter Tight", "Inter", system-ui);
+    font-weight: 300;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.55);
+  }
+  .nav-ed-cta {
+    font-family: var(--font-display, "Inter Tight", "Inter", system-ui);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    color: #fff;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+  .nav-ed-cta--pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
     background: #0a0a0a;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 0;
-    z-index: 100;
-    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.55);
+    color: #fff !important;
+    padding: 12px 22px;
+    border-radius: 999px;
+    transition: background 0.2s ease, color 0.2s ease;
   }
+  .nav-ed-cta--pill:hover {
+    background: var(--accent, #fcff61);
+    color: #0a0a0a !important;
+  }
+  .nav-ed-cta-arrow { font-size: 14px; line-height: 1; }
 
-  /* Vertical category list — leaves revealed to the right on hover/focus */
-  .nav-mega-list {
+  /* Mega menu — minimal dark panel */
+  .nav-ed-mega {
+    position: relative;
+    /* Force inline so the summary stays on the same row as the other links */
+    display: inline-flex;
+    align-items: center;
+  }
+  .nav-ed-mega > summary {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+  .nav-ed-mega > summary::after {
+    content: " ↓";
+    font-size: 0.85em;
+    opacity: 0.55;
+  }
+  .nav-ed-mega[open] > summary::after { content: " ↑"; }
+  .nav-ed-mega-panel {
+    position: absolute;
+    top: calc(100% + 16px);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 720px;
+    background: rgba(10, 10, 10, 0.92);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 24px 32px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55);
+  }
+  .nav-ed-mega-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 24px;
+  }
+  .nav-ed-mega-head {
+    display: block;
+    font-family: var(--font-display, "Inter Tight", "Inter", system-ui);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    text-decoration: none;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    transition: color 0.15s ease;
+  }
+  .nav-ed-mega-head:hover { color: var(--accent, #fcff61); }
+  .nav-ed-mega-leaves {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
-    width: 280px;
+    gap: 8px;
   }
-  .nav-mega-cat {
-    position: relative;
-    border-bottom: 1px solid var(--fg-10);
-  }
-  .nav-mega-cat:last-child { border-bottom: none; }
-  .nav-mega-cat-link {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 18px 22px;
-    text-decoration: none;
-    color: var(--fg);
-    transition: background 0.15s ease, color 0.15s ease;
-  }
-  .nav-mega-cat-head {
-    font-family: var(--font-display);
-    font-size: 14px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    font-weight: 500;
-  }
-  .nav-mega-cat-arrow {
+  .nav-ed-mega-leaves a {
     font-size: 13px;
-    color: var(--fg-40);
-    opacity: 0;
-    transform: translateX(-4px);
-    transition: opacity 0.18s ease, transform 0.18s ease, color 0.18s ease;
-  }
-  .nav-mega-cat:hover > .nav-mega-cat-link,
-  .nav-mega-cat:focus-within > .nav-mega-cat-link {
-    background: rgba(255, 213, 56, 0.06);
-  }
-  .nav-mega-cat:hover .nav-mega-cat-head,
-  .nav-mega-cat:focus-within .nav-mega-cat-head {
-    color: var(--accent);
-  }
-  .nav-mega-cat:hover .nav-mega-cat-arrow,
-  .nav-mega-cat:focus-within .nav-mega-cat-arrow {
-    opacity: 1;
-    transform: translateX(0);
-    color: var(--accent);
-  }
-
-  /* Leaves panel — slides in to the right of the hovered category */
-  .nav-mega-leaves {
-    list-style: none;
-    margin: 0;
-    padding: 24px 26px;
-    position: absolute;
-    top: 0;
-    left: 280px;
-    width: 440px;
-    min-height: 100%;
-    background: #0a0a0a;
-    border-left: 1px solid var(--fg-10);
-    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.55);
-    display: grid;
-    align-content: start;
-    gap: 4px;
-    visibility: hidden;
-    opacity: 0;
-    transform: translateX(-6px);
-    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s 0.18s;
-    pointer-events: none;
-  }
-  .nav-mega-cat:hover > .nav-mega-leaves,
-  .nav-mega-cat:focus-within > .nav-mega-leaves {
-    visibility: visible;
-    opacity: 1;
-    transform: translateX(0);
-    pointer-events: auto;
-    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s 0s;
-  }
-  .nav-mega-leaves a {
-    display: block;
-    font-family: var(--font-display);
-    font-size: 14px;
-    color: var(--fg-60);
-    padding: 10px 12px;
-    border-bottom: 1px solid transparent;
-    transition: color 0.15s ease, background 0.15s ease;
+    color: rgba(255, 255, 255, 0.72);
     text-decoration: none;
+    transition: color 0.15s ease;
   }
-  .nav-mega-leaves a:hover {
-    color: var(--fg);
-    background: rgba(255, 255, 255, 0.04);
+  .nav-ed-mega-leaves a:hover { color: #fff; }
+
+  /* Nav defaults to white — pages with the dark hero video keep it as-is.
+     The mega-menu panel keeps its own dark glass background regardless of
+     page theme so the dropdown is always readable. */
+  .nav-ed,
+  .nav-ed-brand,
+  .nav-ed-link,
+  .nav-ed-cta { color: #fff !important; }
+  .nav-ed-clock { color: rgba(255, 255, 255, 0.78) !important; }
+  .nav-ed-sep { color: rgba(255, 255, 255, 0.55) !important; }
+
+  /* Day-mode pages without a dark hero (Approche, Équipe, Lab, etc.) —
+     swap the nav to dark text + logo so it stays readable on the light bg.
+     Also kicks in mid-scroll on the home page once the hero has scrolled
+     past the nav: a tiny script flips data-nav-mode="light" on <html>. */
+  html[data-theme="light"] .nav-ed,
+  html[data-theme="light"] .nav-ed-brand,
+  html[data-theme="light"] .nav-ed-link,
+  html[data-theme="light"] .nav-ed-cta:not(.nav-ed-cta--pill),
+  html[data-nav-mode="light"] .nav-ed,
+  html[data-nav-mode="light"] .nav-ed-brand,
+  html[data-nav-mode="light"] .nav-ed-link,
+  html[data-nav-mode="light"] .nav-ed-cta:not(.nav-ed-cta--pill) {
+    color: #0a0a0a !important;
+  }
+  html[data-theme="light"] .nav-ed-clock,
+  html[data-nav-mode="light"] .nav-ed-clock {
+    color: rgba(10, 10, 10, 0.65) !important;
+  }
+  html[data-theme="light"] .nav-ed-sep,
+  html[data-nav-mode="light"] .nav-ed-sep {
+    color: rgba(10, 10, 10, 0.4) !important;
+  }
+  html[data-theme="light"] .nav-ed-brand-logo,
+  html[data-nav-mode="light"] .nav-ed-brand-logo {
+    filter: none; /* keep the SVG black on light backgrounds */
   }
 
-  @media (max-width: 720px) {
-    .nav-mega-panel { width: calc(100vw - 32px); left: 16px; transform: none; }
-    .nav-mega-list { width: 100%; }
-    /* Mobile: leaves stack under their category (no fly-out) */
-    .nav-mega-leaves {
-      position: static;
-      left: auto;
-      width: 100%;
-      min-height: 0;
-      visibility: visible;
-      opacity: 1;
-      transform: none;
-      pointer-events: auto;
-      padding: 0 22px 18px;
-      border-left: none;
-      background: transparent;
+  /* Light pages → light frosted glass so dark text stays readable. */
+  html[data-theme="light"] .nav-ed,
+  html[data-nav-mode="light"] .nav-ed {
+    background: rgba(248, 248, 250, 0.6);
+    border-bottom-color: rgba(10, 10, 10, 0.08);
+  }
+
+  /* Smooth fade between modes so the colour switch isn't jarring */
+  .nav-ed,
+  .nav-ed-brand,
+  .nav-ed-link,
+  .nav-ed-cta,
+  .nav-ed-clock,
+  .nav-ed-sep { transition: color 0.25s ease; }
+  .nav-ed-brand-logo { transition: filter 0.25s ease; }
+
+  @media (max-width: 960px) {
+    .nav-ed {
+      grid-template-columns: auto auto;
+      grid-template-rows: auto auto;
+      padding: 14px 16px;
+      gap: 10px 16px;
     }
-    .nav-mega-cat-arrow { display: none; }
-  }
+    .nav-ed-left { grid-column: 1; grid-row: 1; gap: 12px; }
+    .nav-ed-right { grid-column: 2; grid-row: 1; gap: 14px; }
+    .nav-ed-tagline,
+    .nav-ed-rule { display: none; }
+    .nav-ed-cta--pill { padding: 9px 14px; font-size: 11px; gap: 8px; }
+    .nav-ed-cta-arrow { font-size: 12px; }
+    .nav-ed-center {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      justify-self: start;
+      gap: 8px;
+      max-width: 100%;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .nav-ed-center::-webkit-scrollbar { display: none; }
+    .nav-ed-link,
+    .nav-ed-mega > summary { font-size: 13px; white-space: nowrap; }
+    .nav-ed-sep { font-size: 13px; }
+    .nav-ed-brand-logo { height: 32px; }
+    .nav-ed-clock { font-size: 11px; letter-spacing: 0.06em; }
+    .nav-ed-cta { font-size: 12px; }
 
-  /* ============================================================
-     LIGHT-THEME OVERRIDES (active on /lab/ + /nl/lab/ via
-     body[data-theme="light"] set by Base.astro)
-     ============================================================ */
-  :global([data-theme="light"]) .nav-mega-panel {
-    background: #f5f3ec;
-    border: 1px solid rgba(10, 10, 10, 0.10);
-    box-shadow:
-      0 12px 28px -8px rgba(10, 10, 10, 0.18),
-      0 40px 80px -20px rgba(10, 10, 10, 0.22);
-  }
-  :global([data-theme="light"]) .nav-mega-leaves {
-    background: #f5f3ec;
-    border-left: 1px solid rgba(10, 10, 10, 0.10);
-  }
-  :global([data-theme="light"]) .nav-mega-cat { border-bottom-color: rgba(10, 10, 10, 0.10); }
-  :global([data-theme="light"]) .nav-mega-cat-link { color: #0a0a0a; }
-  :global([data-theme="light"]) .nav-mega-cat-head {
-    color: #0a0a0a;
-    font-weight: 600;
-  }
-  :global([data-theme="light"]) .nav-mega-cat:hover > .nav-mega-cat-link,
-  :global([data-theme="light"]) .nav-mega-cat:focus-within > .nav-mega-cat-link {
-    background: rgba(255, 213, 56, 0.14);
-  }
-  :global([data-theme="light"]) .nav-mega-cat:hover .nav-mega-cat-head,
-  :global([data-theme="light"]) .nav-mega-cat:focus-within .nav-mega-cat-head { color: #0a0a0a; }
-  :global([data-theme="light"]) .nav-mega-cat-arrow { color: rgba(10, 10, 10, 0.40); }
-  :global([data-theme="light"]) .nav-mega-cat:hover .nav-mega-cat-arrow,
-  :global([data-theme="light"]) .nav-mega-cat:focus-within .nav-mega-cat-arrow { color: #0a0a0a; }
-  :global([data-theme="light"]) .nav-mega-leaves a {
-    color: rgba(10, 10, 10, 0.70);
-    font-weight: 500;
-  }
-  :global([data-theme="light"]) .nav-mega-leaves a:hover {
-    color: #0a0a0a;
-    background: rgba(10, 10, 10, 0.04);
-  }
-  :global([data-theme="light"]) .nav-mega > summary.nav-bn-link-style {
-    color: rgba(10, 10, 10, 0.70);
-  }
-  :global([data-theme="light"]) .nav-mega > summary.nav-bn-link-style:hover {
-    color: #0a0a0a;
+    /* Full-width mobile mega panel — anchor to the viewport, not the SERVICES tab */
+    .nav-ed-mega { position: static; }
+    .nav-ed-mega-panel {
+      position: fixed;
+      left: 8px;
+      right: 8px;
+      top: calc(var(--nav-mobile-h, 110px));
+      transform: none;
+      min-width: 0;
+      width: auto;
+      max-height: calc(100vh - var(--nav-mobile-h, 110px) - 16px);
+      overflow-y: auto;
+      padding: 18px 18px 22px;
+    }
+    .nav-ed-mega-list {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .nav-ed-mega-head {
+      font-size: 12px;
+      padding-bottom: 6px;
+      margin-bottom: 6px;
+    }
+    .nav-ed-mega-leaves { gap: 4px; }
+    .nav-ed-mega-leaves a { font-size: 13px; padding: 2px 0; }
   }
 </style>
 
 <script>
-  // Close the mega menu when clicking outside or pressing Escape.
-  const mega = document.querySelector<HTMLDetailsElement>(".nav-mega");
+  // Live clock — updates every 10s, format "HH : MM AM/PM"
+  const el = document.getElementById("nav-ed-clock");
+  if (el) {
+    const fmt = () => {
+      const d = new Date();
+      let h = d.getHours();
+      const m = d.getMinutes();
+      const ampm = h >= 12 ? "PM" : "AM";
+      h = h % 12; if (h === 0) h = 12;
+      el.textContent = `${String(h).padStart(2, "0")} : ${String(m).padStart(2, "0")} ${ampm}`;
+    };
+    fmt();
+    setInterval(fmt, 10000);
+  }
+
+  // Close mega menu on outside click / Escape
+  const mega = document.querySelector<HTMLDetailsElement>(".nav-ed-mega");
   if (mega) {
     document.addEventListener("click", (e) => {
       if (!mega.contains(e.target as Node)) mega.open = false;
@@ -287,4 +400,8 @@ const link = (path: string) => localizedPath(locale, path);
       if (e.key === "Escape") mega.open = false;
     });
   }
+
+  /* The site is fully light-themed (liquid hero included), so the nav renders
+     in dark ink on light glass via the html[data-theme="light"] rule. Dark
+     pages fall back to the default white-on-dark-glass bar. */
 </script>

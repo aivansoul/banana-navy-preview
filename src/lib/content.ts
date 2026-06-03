@@ -12,19 +12,18 @@
  */
 import type { Locale } from "./site";
 
-export const TRUST_CLIENTS = [
-  "Belfius",
-  "SNCB",
-  "ORES",
-  "PharmaLys",
-  "InhaTarget",
-  "Immo-Vision",
-  "MonkeyBridge",
-  "Mademoiselle Jo",
-  "Secundo",
-  "Lusty Foods",
-  "Horse Notebook",
-  "jachetevotreauto.be",
+export type TrustClient = { name: string; logo?: string; logoHeight?: number };
+
+export const TRUST_CLIENTS: TrustClient[] = [
+  { name: "SNCB",           logo: "/logos/sncb.png"                                },
+  { name: "Defensie",       logo: "/logos/defensie.png"                            },
+  { name: "Immo Vision",    logo: "/logos/immovision.png"                          },
+  { name: "Mademoiselle Jo",logo: "/logos/mademoiselle-jo.png"                     },
+  { name: "ORES",           logo: "/logos/ores.png",          logoHeight: 64       },
+  { name: "PharmaLys",      logo: "/logos/pharmalys.png"                           },
+  { name: "Secundo",        logo: "/logos/secundo.png"                             },
+  { name: "MonkeyBridge",   logo: "/logos/monkeybridge.png"                        },
+  { name: "Belfius",        logo: "/logos/belfius.png",       logoHeight: 64       },
 ];
 
 /* ============================================================

@@ -1,0 +1,415 @@
+---
+/**
+ * FinalCtaCinematic.astro — full-bleed "curtain reveal" CTA panel.
+ *
+ * Adaptation of the React/Tailwind motion-footer pattern to vanilla Astro:
+ *   - clip-path wrapper + fixed inner panel = the next section "lifts"
+ *     up to reveal the CTA underneath as the user scrolls
+ *   - giant background text fades & scales up via GSAP ScrollTrigger
+ *   - diagonal infinite marquee with brand phrases
+ *   - magnetic glass pills (mousemove → translate/rotate + elastic return)
+ *   - bottom strip: copyright · "Crafted with ♥" badge · back-to-top
+ *
+ * Uses the existing Banana Navy palette (cream bg / near-black ink / yellow
+ * accent #fcff61) — no shadcn tokens, no Plus Jakarta — Inter Tight only.
+ */
+
+interface Props {
+  /** Eyebrow above the headline */
+  eyebrow?: string;
+  /** Main headline. Wrap the accented word in {@link accentWord}. */
+  heading: string;
+  /** Word inside `heading` that should pop in accent yellow. */
+  accentWord?: string;
+  /** Single-line sub-heading shown under the title. */
+  subtitle: string;
+  /** Primary CTA — filled black pill */
+  ctaPrimary: { label: string; href: string };
+  /** Secondary CTA — glass pill */
+  ctaSecondary: { label: string; href: string };
+}
+
+const {
+  eyebrow = "Prêt à lancer ?",
+  heading,
+  accentWord,
+  subtitle,
+  ctaPrimary,
+  ctaSecondary,
+} = Astro.props;
+
+// Compose the heading: replace the accent word with a span so we can style it
+const renderedHeading = accentWord
+  ? heading.replace(
+      new RegExp(`\\b(${accentWord})\\b`, "i"),
+      '<span class="cta-accent">$1</span>',
+    )
+  : heading;
+
+const year = new Date().getFullYear();
+---
+
+<section class="cta-curtain" aria-labelledby="final-cta-h">
+  <div class="cta-curtain-inner">
+
+    {/* ---------- 3. Headline + magnetic pills ---------- */}
+    <div class="cta-content" data-cta-content>
+      <div class="cta-eyebrow">
+        <span class="cta-eyebrow-dot" aria-hidden="true"></span>
+        {eyebrow}
+      </div>
+
+      <h2 id="final-cta-h" class="cta-heading" set:html={renderedHeading}></h2>
+
+      <p class="cta-subtitle">{subtitle}</p>
+
+      <div class="cta-pills">
+        <a class="magnetic cta-pill cta-pill--primary" href={ctaPrimary.href}>
+          <span>{ctaPrimary.label}</span>
+          <span class="cta-pill-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="magnetic cta-pill cta-pill--glass" href={ctaSecondary.href}>
+          <span>{ctaSecondary.label}</span>
+          <span class="cta-pill-arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+
+    {/* ---------- 4. Bottom strip: copyright · top · credit (right) ---------- */}
+    <div class="cta-bottom">
+      <div class="cta-copyright">© {year} Banana Navy · Tous droits réservés.</div>
+
+      <div class="cta-bottom-right">
+        <button class="magnetic cta-top" type="button" aria-label="Retour en haut" data-cta-top>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18">
+            <path d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+          </svg>
+        </button>
+        <span class="cta-credit">Crafted with <span class="cta-heart">♥</span> By Banana Navy</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ============================================================
+     CINEMATIC CURTAIN-REVEAL CTA
+     ============================================================ */
+  /* Normal-flow block — the cinematic effects (marquee, watermark, aurora,
+     content fade-in) stay; the section just doesn't pin itself to the
+     viewport anymore, so the footer below isn't covered. */
+  .cta-curtain {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+  .cta-curtain-inner {
+    position: relative;
+    width: 100%;
+    background: transparent;     /* global WaterBackground shows through */
+    color: var(--fg, #0a0a0a);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow: hidden;
+    font-family: "Switzer", "Inter Tight", system-ui, sans-serif;
+  }
+  /* Force Switzer on every text element inside the panel */
+  .cta-curtain-inner :is(h2, p, span, a, button, div) {
+    font-family: "Switzer", "Inter Tight", system-ui, sans-serif;
+  }
+
+  /* ----- Top-aligned content -------------------------------------------- */
+  .cta-content {
+    position: relative;
+    z-index: 2;
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    padding: clamp(72px, 9vh, 132px) 24px 0;
+    max-width: 1180px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .cta-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(10, 10, 10, 0.68);
+    margin-bottom: 24px;
+  }
+  .cta-eyebrow-dot {
+    width: 8px; height: 8px;
+    background: var(--accent, #fcff61);
+    display: inline-block;
+    border-radius: 50%;
+  }
+  .cta-curtain-inner .cta-heading {
+    font-family: var(--font-display);
+  }
+  .cta-heading {
+    margin: 0 0 18px;
+    font-size: calc(clamp(40px, 7vw, 104px) * var(--ds-head-scale, 1) * var(--ds-text-scale, 1));
+    line-height: 0.94;
+    letter-spacing: -0.035em;
+    font-weight: 900;
+    text-transform: none;
+    background: linear-gradient(180deg, #0a0a0a 0%, rgba(10, 10, 10, 0.42) 100%);
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 24px rgba(10, 10, 10, 0.1));
+    max-width: 16ch;
+  }
+  .cta-heading .cta-accent {
+    -webkit-text-fill-color: var(--accent, #fcff61);
+    color: var(--accent, #fcff61);
+    background: none;
+  }
+  .cta-subtitle {
+    margin: 0 0 36px;
+    font-size: calc(clamp(14px, 1.2vw, 17px) * var(--ds-text-scale, 1));
+    color: rgba(10, 10, 10, 0.62);
+    max-width: 56ch;
+  }
+
+  /* ----- Magnetic glass pills (oversized) ------------------------------- */
+  .cta-pills {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .cta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: calc(16px * var(--ds-btn-scale, 1)) calc(32px * var(--ds-btn-scale, 1));
+    border-radius: calc(999px * var(--ds-radius-scale, 1));
+    font-family: "Switzer", "Inter Tight", system-ui, sans-serif;
+    font-size: calc(clamp(13px, 0.9vw, 15px) * var(--ds-btn-scale, 1));
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: background 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cta-pill-arrow {
+    font-size: clamp(14px, 1vw, 16px);
+    line-height: 1;
+  }
+
+  .cta-pill--primary {
+    background: #0a0a0a;
+    color: #fff;
+    border: 1px solid #0a0a0a;
+    box-shadow: 0 16px 36px -16px rgba(0, 0, 0, 0.45);
+  }
+  .cta-pill--primary:hover {
+    background: var(--accent, #fcff61);
+    color: #0a0a0a;
+    border-color: var(--accent, #fcff61);
+    box-shadow: 0 20px 44px -14px rgba(252, 255, 97, 0.55);
+  }
+
+  .cta-pill--glass {
+    background: linear-gradient(145deg, rgba(10,10,10,0.04) 0%, rgba(10,10,10,0.01) 100%);
+    color: #0a0a0a;
+    border: 1px solid rgba(10, 10, 10, 0.12);
+    box-shadow:
+      0 10px 30px -10px rgba(0, 0, 0, 0.12),
+      inset 0 1px 1px rgba(255, 255, 255, 0.6),
+      inset 0 -1px 2px rgba(0, 0, 0, 0.04);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  .cta-pill--glass:hover {
+    background: linear-gradient(145deg, rgba(10,10,10,0.08) 0%, rgba(10,10,10,0.02) 100%);
+    border-color: rgba(10, 10, 10, 0.22);
+    box-shadow:
+      0 20px 40px -10px rgba(0, 0, 0, 0.18),
+      inset 0 1px 1px rgba(255, 255, 255, 0.7);
+  }
+
+  /* ----- Bottom strip --------------------------------------------------- */
+  .cta-bottom {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    margin-top: clamp(48px, 9vh, 112px);
+    padding: 24px clamp(20px, 4vw, 48px) clamp(24px, 4vw, 40px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .cta-copyright {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(10, 10, 10, 0.55);
+  }
+  .cta-bottom-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .cta-credit {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(10, 10, 10, 0.55);
+    white-space: nowrap;
+  }
+  .cta-heart {
+    color: #d44848;
+    font-size: 13px;
+    line-height: 1;
+    animation: cta-heart 2.2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+    display: inline-block;
+  }
+  @keyframes cta-heart {
+    0%, 100% { transform: scale(1);   filter: drop-shadow(0 0 4px rgba(212, 72, 72, 0.45)); }
+    15%, 45% { transform: scale(1.18); filter: drop-shadow(0 0 10px rgba(212, 72, 72, 0.75)); }
+    30%      { transform: scale(1); }
+  }
+
+  .cta-top {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, rgba(10,10,10,0.04) 0%, rgba(10,10,10,0.01) 100%);
+    border: 1px solid rgba(10, 10, 10, 0.14);
+    color: rgba(10, 10, 10, 0.62);
+    box-shadow:
+      0 10px 30px -10px rgba(0, 0, 0, 0.15),
+      inset 0 1px 1px rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.3s ease, background 0.3s ease;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .cta-top:hover { color: #0a0a0a; background: rgba(10, 10, 10, 0.06); }
+  .cta-top svg { transition: transform 0.3s ease; }
+  .cta-top:hover svg { transform: translateY(-3px); }
+
+  /* ----- Responsive ----------------------------------------------------- */
+  @media (max-width: 800px) {
+    .cta-content { padding-top: 56px; }
+    .cta-heading { font-size: clamp(36px, 11vw, 64px); }
+    .cta-subtitle { margin-bottom: 28px; }
+    .cta-pills { flex-direction: column; width: 100%; gap: 12px; }
+    .cta-pill {
+      width: 100%;
+      justify-content: center;
+      padding: 15px 24px;
+      font-size: 13px;
+      gap: 12px;
+    }
+    .cta-bottom {
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 48px;
+      padding-bottom: 22px;
+    }
+    .cta-copyright { order: 2; }
+    .cta-bottom-right { order: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cta-heart { animation: none !important; }
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+  gsap.registerPlugin(ScrollTrigger);
+
+  // ---------- Content scroll-in ----------
+  const section = document.querySelector<HTMLElement>(".cta-curtain");
+  const content = document.querySelector<HTMLElement>("[data-cta-content]");
+
+  if (section && content) {
+    gsap.fromTo(
+      content,
+      { y: 50, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: section,
+          start: "top 50%",
+          end: "bottom bottom",
+          scrub: 1,
+        },
+      },
+    );
+  }
+
+  // ---------- Magnetic buttons (mousemove → translate/rotate) ----------
+  const magnetics = document.querySelectorAll<HTMLElement>(".magnetic");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (!reduceMotion) {
+    magnetics.forEach((el) => {
+      const onMove = (e: MouseEvent) => {
+        const r = el.getBoundingClientRect();
+        const hx = r.width / 2;
+        const hy = r.height / 2;
+        const x = e.clientX - r.left - hx;
+        const y = e.clientY - r.top - hy;
+        gsap.to(el, {
+          x: x * 0.4,
+          y: y * 0.4,
+          rotationX: -y * 0.12,
+          rotationY: x * 0.12,
+          scale: 1.05,
+          ease: "power2.out",
+          duration: 0.4,
+          transformPerspective: 500,
+        });
+      };
+      const onLeave = () => {
+        gsap.to(el, {
+          x: 0,
+          y: 0,
+          rotationX: 0,
+          rotationY: 0,
+          scale: 1,
+          ease: "elastic.out(1, 0.3)",
+          duration: 1.1,
+        });
+      };
+      el.addEventListener("mousemove", onMove);
+      el.addEventListener("mouseleave", onLeave);
+    });
+  }
+
+  // ---------- Back-to-top ----------
+  document.querySelector<HTMLButtonElement>("[data-cta-top]")?.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+</script>
+

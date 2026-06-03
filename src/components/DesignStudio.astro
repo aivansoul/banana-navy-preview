@@ -1,0 +1,528 @@
+---
+/**
+ * DesignStudio.astro — live, dev-only design tweak panel.
+ *
+ * A floating panel (toggle with the ✦ launcher or Shift+D) that lets you tune
+ * the site in the browser and see it instantly:
+ *   - Colours  → writes --bg / --fg (+ opacity ramp) / --accent on :root
+ *   - Fonts    → swaps --font-display / --font-body, loading webfonts on demand
+ *   - Sizes    → text / heading / button / radius scale tokens
+ *   - Animation→ the CTA liquid: intensity, viscosity, refraction, specular,
+ *                ambient speed, and texture preset (via window.__bnFluid)
+ *
+ * Everything persists to localStorage and can be exported as a CSS snippet to
+ * paste back into base.css. Mounted only in dev (see Base.astro), so it never
+ * ships to production.
+ */
+---
+
+<div id="ds-root">
+  <button id="ds-launch" type="button" title="Design Studio — Shift+D" aria-label="Open Design Studio">✦</button>
+
+  <section id="ds-panel" hidden aria-label="Design Studio">
+    <header class="ds-head">
+      <span class="ds-title"><span class="ds-dot"></span> Design Studio</span>
+      <button id="ds-close" class="ds-x" type="button" aria-label="Close">✕</button>
+    </header>
+    <div id="ds-body"></div>
+    <footer class="ds-foot">
+      <button id="ds-reset" class="ds-act ghost" type="button">Reset</button>
+      <button id="ds-copy" class="ds-act solid" type="button">Copy CSS</button>
+    </footer>
+    <div id="ds-toast" hidden></div>
+  </section>
+</div>
+
+<style>
+  #ds-root { font-family: "Inter Tight", system-ui, sans-serif; }
+
+  #ds-launch {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 2147483000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: #111319;
+    color: #fcff61;
+    font-size: 19px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 12px 32px -10px rgba(0, 0, 0, 0.55);
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  #ds-launch:hover { transform: translateY(-2px); background: #171a22; }
+  /* Launcher is shown whenever the panel is closed — derived purely from the
+     panel's hidden state so it can never get stuck hidden. */
+  #ds-root:has(#ds-panel:not([hidden])) #ds-launch { display: none; }
+
+  #ds-panel {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 2147483001;
+    width: 320px;
+    max-height: min(86vh, 760px);
+    display: flex;
+    flex-direction: column;
+    background: rgba(17, 19, 25, 0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    color: #e7e7ee;
+    box-shadow: 0 24px 60px -16px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+    font-size: 12px;
+  }
+  #ds-panel[hidden] { display: none; }
+
+  .ds-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .ds-title { display: inline-flex; align-items: center; gap: 9px; font-weight: 600; font-size: 13px; letter-spacing: -0.01em; }
+  .ds-dot { width: 8px; height: 8px; border-radius: 50%; background: #fcff61; }
+  .ds-x { width: 26px; height: 26px; border-radius: 8px; border: none; background: rgba(255,255,255,0.06); color: #aaa; cursor: pointer; font-size: 12px; }
+  .ds-x:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+  #ds-body { overflow-y: auto; padding: 6px 16px 14px; }
+  #ds-body::-webkit-scrollbar { width: 5px; }
+  #ds-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.14); border-radius: 3px; }
+
+  .ds-group-label {
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: #6c6f7d;
+    margin: 18px 0 8px;
+  }
+  .ds-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 9px;
+    min-height: 22px;
+  }
+  .ds-row > label { color: #b6b8c2; flex-shrink: 0; }
+  .ds-right { display: inline-flex; align-items: center; gap: 8px; }
+
+  .ds-row input[type="range"] {
+    width: 124px;
+    height: 3px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(255,255,255,0.16);
+    border-radius: 2px;
+    outline: none;
+  }
+  .ds-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    background: #fcff61;
+    cursor: pointer;
+  }
+  .ds-val { min-width: 34px; text-align: right; color: #8b8e99; font-variant-numeric: tabular-nums; }
+
+  .ds-row input[type="color"] {
+    width: 30px; height: 22px;
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 6px;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+  }
+  .ds-hex {
+    width: 74px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    color: #cdd0da;
+    padding: 3px 6px;
+    font-size: 11px;
+    font-family: inherit;
+  }
+  .ds-row select {
+    width: 150px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 7px;
+    color: #e2e3ea;
+    padding: 4px 6px;
+    font-size: 11px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  .ds-foot {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .ds-act {
+    flex: 1;
+    padding: 9px 0;
+    border-radius: 9px;
+    border: none;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .ds-act.solid { background: #fcff61; color: #111; }
+  .ds-act.ghost { background: rgba(255,255,255,0.07); color: #cdd0da; }
+  .ds-act.ghost:hover { background: rgba(255,255,255,0.12); }
+
+  #ds-toast {
+    position: absolute;
+    left: 16px; right: 16px; bottom: 64px;
+    background: #fcff61;
+    color: #111;
+    text-align: center;
+    padding: 8px;
+    border-radius: 9px;
+    font-weight: 600;
+    font-size: 11px;
+  }
+  #ds-toast[hidden] { display: none; }
+
+  @media (max-width: 600px) {
+    #ds-panel { width: calc(100vw - 24px); right: 12px; }
+  }
+</style>
+
+<script>
+  (() => {
+  // ---- where is the panel available? ----
+  // Always on dev / localhost. On any other host it stays completely inert
+  // unless explicitly enabled with ?studio (which then persists). Add
+  // ?studio=0 to turn it off again. Real visitors never see or run it.
+  const qs = new URLSearchParams(location.search);
+  if (qs.get("studio") === "0") {
+    localStorage.removeItem("bn-studio-on");
+    document.getElementById("ds-root")?.remove();
+    return;
+  }
+  if (qs.has("studio")) localStorage.setItem("bn-studio-on", "1");
+  const isLocal = ["localhost", "127.0.0.1", "0.0.0.0"].includes(location.hostname);
+  const enabled = import.meta.env.DEV || isLocal || localStorage.getItem("bn-studio-on") === "1";
+  if (!enabled) {
+    document.getElementById("ds-root")?.remove();
+    return;
+  }
+  console.info("[Design Studio] active — click the ✦ button (bottom-right) or press Shift+D.");
+
+  const STORE = "bn-design-studio";
+  const root = document.documentElement;
+
+  // ---- font catalogue (Google families load on demand) ----
+  const FONTS = [
+    { name: "Urbanist", g: "Urbanist:wght@400;500;600;700;800;900" },
+    { name: "Inter Tight", g: "Inter+Tight:wght@400;500;600;700;800;900" },
+    { name: "Space Grotesk", g: "Space+Grotesk:wght@400;500;600;700" },
+    { name: "Sora", g: "Sora:wght@400;500;600;700;800" },
+    { name: "Manrope", g: "Manrope:wght@400;500;600;700;800" },
+    { name: "Plus Jakarta Sans", g: "Plus+Jakarta+Sans:wght@400;500;600;700;800" },
+    { name: "Archivo", g: "Archivo:wght@400;500;600;700;800;900" },
+    { name: "Syne", g: "Syne:wght@400;600;700;800" },
+    { name: "Bricolage Grotesque", g: "Bricolage+Grotesque:wght@400;500;600;700;800" },
+    { name: "Fraunces", g: "Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700" },
+    { name: "Switzer", g: null },
+    { name: "Geist", g: null },
+    { name: "system-ui", g: null },
+  ];
+  const loadedFonts = new Set<string>();
+  function loadFont(name: string) {
+    const f = FONTS.find((x) => x.name === name);
+    if (!f || !f.g || loadedFonts.has(name)) return;
+    const l = document.createElement("link");
+    l.rel = "stylesheet";
+    l.href = `https://fonts.googleapis.com/css2?family=${f.g}&display=swap`;
+    document.head.appendChild(l);
+    loadedFonts.add(name);
+  }
+  function fontStack(name: string, kind: "display" | "body") {
+    if (name === "system-ui") return "system-ui, sans-serif";
+    const fb = kind === "display"
+      ? '"Switzer", "Inter Tight", system-ui, sans-serif'
+      : '"Inter Tight", system-ui, sans-serif';
+    return `"${name}", ${fb}`;
+  }
+
+  // ---- colour helpers ----
+  function toHex(v: string): string {
+    v = (v || "").trim();
+    if (v.startsWith("#")) {
+      if (v.length === 4) return "#" + v.slice(1).split("").map((c) => c + c).join("");
+      return v.slice(0, 7);
+    }
+    const m = v.match(/rgba?\(([^)]+)\)/);
+    if (m) {
+      const [r, g, b] = m[1].split(",").map((n) => parseInt(n.trim(), 10));
+      return "#" + [r, g, b].map((n) => n.toString(16).padStart(2, "0")).join("");
+    }
+    return "#000000";
+  }
+  function hexToRgb(hex: string) {
+    const h = hex.replace("#", "");
+    const f = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+    const n = parseInt(f, 16);
+    return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+  }
+
+  // ---- state ----
+  function defaults() {
+    const cs = getComputedStyle(root);
+    const read = (v: string, f: string) => (cs.getPropertyValue(v).trim() || f);
+    return {
+      colors: {
+        bg: toHex(read("--bg", "#F4F4F6")),
+        fg: toHex(read("--fg", "#0a0a0a")),
+        accent: toHex(read("--accent", "#fcff61")),
+      },
+      fonts: { display: "Urbanist", body: "Switzer" },
+      scales: { text: 1, head: 1, btn: 1, radius: 1 },
+      // Seed from the live water background when present, so the panel reflects
+      // (and never fights) the page's actual defaults.
+      fluid: ((window as any).__bnFluid?.getParams?.()) || {
+        intensity: 1.0, viscosity: 0.972, refraction: 0.16, specular: 0.7, ambientSpeed: 1.0, texture: "Clear water",
+      },
+      // Hero metal sphere — defaults to the live sphere colour (which itself
+      // defaults to the page background), so it matches the backdrop.
+      sphere: { color: ((window as any).__bnSphere?.getColor?.()) || toHex(read("--bg", "#F4F4F6")) },
+    };
+  }
+  type State = ReturnType<typeof defaults>;
+
+  function load(): State {
+    const d = defaults();
+    try {
+      const s = JSON.parse(localStorage.getItem(STORE) || "{}");
+      return {
+        colors: { ...d.colors, ...(s.colors || {}) },
+        fonts: { ...d.fonts, ...(s.fonts || {}) },
+        scales: { ...d.scales, ...(s.scales || {}) },
+        fluid: { ...d.fluid, ...(s.fluid || {}) },
+        sphere: { ...d.sphere, ...(s.sphere || {}) },
+      };
+    } catch (e) {
+      return d;
+    }
+  }
+  let state = load();
+  const save = () => localStorage.setItem(STORE, JSON.stringify(state));
+
+  // ---- apply state → the live page ----
+  function applyColors() {
+    root.style.setProperty("--bg", state.colors.bg);
+    root.style.setProperty("--accent", state.colors.accent);
+    const { r, g, b } = hexToRgb(state.colors.fg);
+    root.style.setProperty("--fg", state.colors.fg);
+    const ramp: [string, number][] = [["--fg-60", 0.62], ["--fg-40", 0.42], ["--fg-20", 0.22], ["--fg-10", 0.12], ["--fg-05", 0.06]];
+    ramp.forEach(([k, a]) => root.style.setProperty(k, `rgba(${r}, ${g}, ${b}, ${a})`));
+  }
+  function applyFonts() {
+    loadFont(state.fonts.display);
+    loadFont(state.fonts.body);
+    root.style.setProperty("--font-display", fontStack(state.fonts.display, "display"));
+    const bodyStack = fontStack(state.fonts.body, "body");
+    root.style.setProperty("--font-body", bodyStack);
+    root.style.setProperty("--font-mono", bodyStack);
+  }
+  function applyScales() {
+    root.style.setProperty("--ds-text-scale", String(state.scales.text));
+    root.style.setProperty("--ds-head-scale", String(state.scales.head));
+    root.style.setProperty("--ds-btn-scale", String(state.scales.btn));
+    root.style.setProperty("--ds-radius-scale", String(state.scales.radius));
+  }
+  function applyFluid() {
+    const f = (window as any).__bnFluid;
+    if (!f) return;
+    f.setParam("intensity", state.fluid.intensity);
+    f.setParam("viscosity", state.fluid.viscosity);
+    f.setParam("refraction", state.fluid.refraction);
+    f.setParam("specular", state.fluid.specular);
+    f.setParam("ambientSpeed", state.fluid.ambientSpeed);
+    if (f.params.texture !== state.fluid.texture) f.setTexture(state.fluid.texture);
+  }
+  function applySphere() {
+    const s = (window as any).__bnSphere;
+    if (s) s.setColor(state.sphere.color);
+  }
+  function applyAll() { applyColors(); applyFonts(); applyScales(); applyFluid(); applySphere(); }
+
+  // The fluid / sphere components may init after us — re-apply when ready.
+  window.addEventListener("bn-fluid-ready", applyFluid);
+  window.addEventListener("bn-sphere-ready", applySphere);
+
+  // ---- control builders ----
+  const body = document.getElementById("ds-body")!;
+  function group(label: string) {
+    const h = document.createElement("div");
+    h.className = "ds-group-label";
+    h.textContent = label;
+    body.appendChild(h);
+  }
+  function row(label: string) {
+    const r = document.createElement("div");
+    r.className = "ds-row";
+    const l = document.createElement("label");
+    l.textContent = label;
+    const right = document.createElement("div");
+    right.className = "ds-right";
+    r.append(l, right);
+    body.appendChild(r);
+    return right;
+  }
+  function colorRow(label: string, get: () => string, set: (v: string) => void, apply: () => void = applyColors) {
+    const right = row(label);
+    const picker = document.createElement("input");
+    picker.type = "color";
+    picker.value = get();
+    const hex = document.createElement("input");
+    hex.type = "text";
+    hex.className = "ds-hex";
+    hex.value = get();
+    const sync = (v: string) => { picker.value = v; hex.value = v; set(v); apply(); save(); };
+    picker.addEventListener("input", () => sync(picker.value));
+    hex.addEventListener("change", () => { if (/^#[0-9a-fA-F]{6}$/.test(hex.value)) sync(hex.value); });
+    right.append(picker, hex);
+  }
+  function selectRow(label: string, opts: string[], get: () => string, set: (v: string) => void, onChange: () => void) {
+    const right = row(label);
+    const sel = document.createElement("select");
+    opts.forEach((o) => {
+      const op = document.createElement("option");
+      op.value = o; op.textContent = o;
+      if (o === get()) op.selected = true;
+      sel.appendChild(op);
+    });
+    sel.addEventListener("change", () => { set(sel.value); onChange(); save(); });
+    right.appendChild(sel);
+  }
+  function rangeRow(label: string, min: number, max: number, step: number, get: () => number, set: (v: number) => void, onChange: () => void, digits = 2) {
+    const right = row(label);
+    const rng = document.createElement("input");
+    rng.type = "range";
+    rng.min = String(min); rng.max = String(max); rng.step = String(step);
+    rng.value = String(get());
+    const val = document.createElement("span");
+    val.className = "ds-val";
+    val.textContent = get().toFixed(digits);
+    rng.addEventListener("input", () => {
+      const v = parseFloat(rng.value);
+      set(v);
+      val.textContent = v.toFixed(digits);
+      onChange();
+      save();
+    });
+    right.append(rng, val);
+  }
+
+  // ---- build the panel ----
+  const fontNames = FONTS.map((f) => f.name);
+  const textureNames = ((window as any).__bnFluid?.textures) || ["Navy ink", "Charcoal", "Aurora", "Mono soft", "Warm sand"];
+
+  group("Colours");
+  colorRow("Background", () => state.colors.bg, (v) => (state.colors.bg = v));
+  colorRow("Ink / text", () => state.colors.fg, (v) => (state.colors.fg = v));
+  colorRow("Accent", () => state.colors.accent, (v) => (state.colors.accent = v));
+
+  group("Typography");
+  selectRow("Display font", fontNames, () => state.fonts.display, (v) => (state.fonts.display = v), applyFonts);
+  selectRow("Body font", fontNames, () => state.fonts.body, (v) => (state.fonts.body = v), applyFonts);
+  rangeRow("Text scale", 0.7, 1.6, 0.01, () => state.scales.text, (v) => (state.scales.text = v), applyScales);
+  rangeRow("Heading scale", 0.7, 1.8, 0.01, () => state.scales.head, (v) => (state.scales.head = v), applyScales);
+
+  group("Buttons");
+  rangeRow("Button size", 0.7, 1.6, 0.01, () => state.scales.btn, (v) => (state.scales.btn = v), applyScales);
+  rangeRow("Corner radius", 0, 1.4, 0.01, () => state.scales.radius, (v) => (state.scales.radius = v), applyScales);
+
+  group("Liquid animation");
+  selectRow("Texture", textureNames, () => state.fluid.texture, (v) => (state.fluid.texture = v), applyFluid);
+  rangeRow("Intensity", 0, 2.5, 0.05, () => state.fluid.intensity, (v) => (state.fluid.intensity = v), applyFluid);
+  rangeRow("Viscosity", 0.9, 0.995, 0.001, () => state.fluid.viscosity, (v) => (state.fluid.viscosity = v), applyFluid, 3);
+  rangeRow("Refraction", 0, 0.5, 0.005, () => state.fluid.refraction, (v) => (state.fluid.refraction = v), applyFluid, 3);
+  rangeRow("Specular", 0, 2, 0.05, () => state.fluid.specular, (v) => (state.fluid.specular = v), applyFluid);
+  rangeRow("Ambient speed", 0, 3, 0.05, () => state.fluid.ambientSpeed, (v) => (state.fluid.ambientSpeed = v), applyFluid);
+
+  // ---- open / close ----
+  const panel = document.getElementById("ds-panel")!;
+  const launch = document.getElementById("ds-launch")!;
+  const setOpen = (open: boolean) => {
+    panel.hidden = !open;   // launcher visibility follows via CSS :has()
+  };
+  launch.addEventListener("click", () => setOpen(true));
+  document.getElementById("ds-close")!.addEventListener("click", () => setOpen(false));
+  window.addEventListener("keydown", (e) => {
+    if (e.shiftKey && (e.key === "D" || e.key === "d") && !/input|textarea|select/i.test((e.target as HTMLElement)?.tagName || "")) {
+      e.preventDefault();
+      setOpen(panel.hidden);
+    }
+  });
+
+  // ---- toast ----
+  const toast = document.getElementById("ds-toast")!;
+  let toastT = 0;
+  function showToast(msg: string) {
+    toast.textContent = msg;
+    toast.hidden = false;
+    clearTimeout(toastT);
+    toastT = window.setTimeout(() => (toast.hidden = true), 1400);
+  }
+
+  // ---- reset ----
+  document.getElementById("ds-reset")!.addEventListener("click", () => {
+    localStorage.removeItem(STORE);
+    location.reload();
+  });
+
+  // ---- export CSS ----
+  document.getElementById("ds-copy")!.addEventListener("click", () => {
+    const { r, g, b } = hexToRgb(state.colors.fg);
+    const fgr = (a: number) => `rgba(${r}, ${g}, ${b}, ${a})`;
+    const css =
+`/* === Design Studio export — paste the tokens into src/styles/base.css === */
+[data-theme="light"] {
+  --bg: ${state.colors.bg};
+  --fg: ${state.colors.fg};
+  --fg-60: ${fgr(0.62)};
+  --fg-40: ${fgr(0.42)};
+  --fg-20: ${fgr(0.22)};
+  --fg-10: ${fgr(0.12)};
+  --fg-05: ${fgr(0.06)};
+  --accent: ${state.colors.accent};
+  --font-display: ${fontStack(state.fonts.display, "display")};
+  --font-body: ${fontStack(state.fonts.body, "body")};
+  --ds-text-scale: ${state.scales.text};
+  --ds-head-scale: ${state.scales.head};
+  --ds-btn-scale: ${state.scales.btn};
+  --ds-radius-scale: ${state.scales.radius};
+}
+
+/* CTA liquid defaults — set these in FinalCtaCinematic.astro's \`params\` object */
+/* intensity: ${state.fluid.intensity}, viscosity: ${state.fluid.viscosity}, refraction: ${state.fluid.refraction},
+   specular: ${state.fluid.specular}, ambientSpeed: ${state.fluid.ambientSpeed}, texture: "${state.fluid.texture}" */`;
+    navigator.clipboard?.writeText(css).then(
+      () => showToast("CSS copied to clipboard"),
+      () => showToast("Copy failed — see console") ,
+    );
+    console.log(css);
+  });
+
+  // ---- boot ----
+  applyAll();
+  })();
+</script>

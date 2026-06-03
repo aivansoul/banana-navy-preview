@@ -84,6 +84,7 @@ const dict: Record<Locale, Dict> = {
       mentions: "/mentions-legales/",
       privacy: "/politique-confidentialite/",
       cgv: "/cgv/",
+      newsletter: "/newsletter/",
     },
   },
   nl: {
@@ -139,6 +140,7 @@ const dict: Record<Locale, Dict> = {
       mentions: "/mentions-legales/",
       privacy: "/politique-confidentialite/",
       cgv: "/cgv/",
+      newsletter: "/newsletter/",
     },
   },
 };
