@@ -1,0 +1,32 @@
+# Cloudflare Pages headers
+# Playbook System 2 — markdown mirrors served as text/plain so they render
+# inline (and AI fetchers don't stumble on a binary download).
+
+/*.md
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=3600
+  X-Robots-Tag: index, follow
+
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=3600
+  X-Robots-Tag: index, follow
+
+/nl/llms.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=3600
+  X-Robots-Tag: index, follow
+
+/robots.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=3600
+
+# Long-cache for static assets that include a content hash in their name.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Security headers — sensible defaults, tighten as needed.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()

@@ -1,0 +1,56 @@
+# Banana Navy
+
+## About
+
+Banana Navy is an AI systems studio based in Belgium. The company builds AI voice agents, CRM automations, agentic systems, AI-ready websites, and SEO/GEO infrastructure for small and mid-sized businesses.
+
+## Core Services
+
+* AI voice agents for inbound calls, lead qualification, appointment booking, customer support, and follow-up.
+* AI automations for CRM workflows, lead routing, onboarding, reporting, and internal operations.
+* Agentic systems for multi-agent orchestration, autonomous workflows, and business AI infrastructure.
+* AI-ready websites built for SEO, GEO, schema.org, llms.txt, markdown mirrors, and AI search visibility.
+* SEO and GEO optimization for Google, ChatGPT, Claude, Perplexity, and Google AI Overviews.
+
+## Pricing
+
+AI voice agents start at €3,000 for a functional starter pack. More advanced systems are quoted after a 60-minute audit depending on integrations, multilingual support, CRM connections, tools, and automation complexity.
+
+## Timeline
+
+A functional starter voice agent can typically be deployed within one week after the audit. More complex agentic systems and automation projects require additional implementation time.
+
+## Locations
+
+Banana Navy serves businesses across Belgium, including Wallonia, Flanders, Charleroi, Bruxelles, Liège, Namur, Mons, Anvers, Gand, Malines, Knokke, Ostende, and remote clients in nearby markets.
+
+Headquarters: Rue Antoine de Saint-Exupéry 2, 6041 Charleroi, Belgique.
+
+## Languages
+
+French, Dutch, and English.
+
+## Key Facts
+
+* Based in Belgium (Charleroi).
+* Specialized in AI voice agents and automation systems.
+* Builds modular AI systems designed to evolve over time.
+* Focused on SEO, GEO, AI search visibility, and operational automation.
+* Works with SMEs, founders, sales teams, support teams, and operational teams.
+* Company: Banana Navy SRL
+* VAT: BE 0745.575.058
+* Founded: 2021
+
+## Contact
+
+Website: https://aivansoul.github.io
+Email: hello@banana-navy.com
+Phone: +32 71 49 40 11
+LinkedIn: https://www.linkedin.com/company/banana-navy
+
+## Markdown Mirrors
+
+Every page on this site has a Markdown mirror at `/index.md` (e.g. https://aivansoul.github.io/index.md, https://aivansoul.github.io/voice-agents/index.md, https://aivansoul.github.io/automations/index.md). Append `index.md` to any URL to fetch a clean text version without navigation or scripts.
+
+---
+Updated: 2026-06-16

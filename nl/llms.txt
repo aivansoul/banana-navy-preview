@@ -1,0 +1,299 @@
+# Banana Navy
+
+> Banana Navy ontwerpt modulaire agent-systemen die communicatie, operations, leadgeneratie en digitale groei automatiseren — via AI-agents, workflows en infrastructuur ontworpen om de snelle AI-evoluties bij te houden, zonder na 12 maanden obsoleet te zijn.
+
+## About
+Banana Navy (Banana Navy SRL) is een Belgische studio in Charleroi (BE). Opgericht in 2021. We ontwerpen en exploiteren modulaire agent-systemen in productie: voice- en chat-agents, operationele automatisering, business AI-infrastructuur, AI-ready websites, en SEO + GEO-optimalisatie. Onze handtekening: een stap 4 genaamd "Evolve" — modulaire architectuur waarbij elke laag (modellen, vector store, agents, tools) een uitwisselbare module is, zodat de stack de snelle AI-evoluties volgt zonder complete rebuild na 12 maanden.
+
+## Drie pijlers
+- **Agents** — orkestratie en communicatie. Omvat Agentic Systems + Voice Agents.
+- **Automate** — operations. Omvat Automations (CRM, routing, onboarding).
+- **Create** — interface en discovery. Omvat Create (AI-ready websites) + SEO (GEO + AI Search).
+
+## Vijf lagen
+- **01 — Communicatie** (voice-agents) · Voice agents — de communicatielaag. Je klanten praten met een AI-agent die 24/7 beschikbaar is.
+- **02 — Operations** (automations) · Automations — de operationele laag. Workflows die uitvoeren wat je teams niet meer zouden mogen aanraken.
+- **03 — Discovery** (seo) · SEO + GEO — de discovery-laag. Om gevonden te worden door Google en geciteerd door ChatGPT, Claude, Perplexity.
+- **04 — Interface** (create) · Web systems — de interfacelaag. Sites en apps AI-ready, ontworpen voor conversie en machine-leesbaarheid.
+- **05 — Orkestratie** (agentic-systems) · Agentic systems — de orkestratielaag. Agents die de andere vier lagen coördineren als een dirigent.
+
+## Diensten & Prijzen
+
+### Agentic Systems — Orkestratie: agents die je systemen, data en beslissingen coördineren.
+
+Details: We ontwerpen de agent-infrastructuur die je business orkestreert — geen geïsoleerde chatbot, maar een team van AI-agents dat beslissingen neemt, acties triggert en je bestaande systemen coördineert. Het is de laag boven al de rest.
+
+- **Multi-agent workflows** — Meerdere gespecialiseerde AI-agents die parallel samenwerken aan complexe taken.
+  - Opdeling van een taak in sub-agents
+  - Parallelle coördinatie (CMO, CRO, COO stijl)
+  - Eindsynthese door een review-agent
+  - Gestructureerde logs en volledige audit
+  → https://aivansoul.github.io/nl/agentic-systems/multi-agent-workflows/
+
+- **AI Orchestration** — Een orkestratie-agent die aanvragen routeert naar de juiste specialist of API.
+  - Intentiegebaseerde routing
+  - Menselijke fallback bij twijfel
+  - Connectoren naar CRM, ERP, kalender, betaling
+  - End-to-end observability
+  → https://aivansoul.github.io/nl/agentic-systems/ai-orchestration/
+
+- **Autonomous Operations** — Operations die draaien zonder menselijke interventie, terwijl jij slaapt.
+  - Nachtelijke crons voor audits, follow-ups, rapporten
+  - Anomaliedetectie + voorwaardelijke alerts
+  - Lead-recovery zonder handmatig CRM-werk
+  - Standaard «draft-only» guardrail
+  → https://aivansoul.github.io/nl/agentic-systems/autonomous-operations/
+
+- **Business AI Infrastructure** — Het technische fundament om AI intern uit te rollen: RAG, vector store, observability, security.
+  - Production-ready RAG op je data
+  - Managed of self-hosted vector store
+  - Eval suite + regressietests in CI
+  - EU-hosting + soevereine logs
+  → https://aivansoul.github.io/nl/agentic-systems/business-ai-infrastructure/
+
+Bekijk alles: https://aivansoul.github.io/nl/agentic-systems/
+
+---
+
+### Voice Agents — De communicatielaag. Je klanten praten — een AI-agent antwoordt, kwalificeert, draagt over.
+
+Details: Voice-agents die de telefoon 24/7 opnemen, oproepen kwalificeren, afspraken maken en doorgeven aan je team waar nodig. We bouwen ze op Twilio ConversationRelay (of equivalent) met een helder script en directe menselijke fallback.
+
+- **AI Receptionist** — AI-receptioniste die elke oproep aanneemt, de intentie identificeert en doorschakelt naar de juiste persoon.
+  - Antwoord in minder dan 2 belsignalen, 24/7
+  - Routing naar de juiste interne nummers
+  - Voicemail transcript + email + Slack
+  - Gekloonde of neutrale stem naar keuze
+  → https://aivansoul.github.io/nl/voice-agents/ai-receptionist/
+
+- **AI Sales Agent** — Sales-agent die binnenkomende leads in minder dan 30 seconden kwalificeert.
+  - 3–4 adaptieve kwalificatievragen
+  - Afspraken via Calendly/GHL
+  - Warme transfer bij premium leads
+  - Eerste 30 dagen altijd in draft-modus
+  → https://aivansoul.github.io/nl/voice-agents/ai-sales-agent/
+
+- **AI Support Agent** — Support-agent die courante vragen oplost en de rest escaleert met volledige context.
+  - RAG op je knowledge base
+  - Frustratie-detectie → menselijke escalatie
+  - Ticket-creatie met gestructureerde context
+  - Leert van menselijke oplossingen voor de toekomst
+  → https://aivansoul.github.io/nl/voice-agents/ai-support-agent/
+
+Bekijk alles: https://aivansoul.github.io/nl/voice-agents/
+
+---
+
+### Automations — De operationele laag. Workflows die uitvoeren wat je teams niet meer zouden mogen aanraken.
+
+Details: We automatiseren de operationele flows die je dagen opslokken: CRM, lead-routing, klant-onboarding, follow-ups. Direct in je stack, in uitwisselbare modules — komt er over 6 maanden een betere tool, dan wisselen we de module, niet het systeem.
+
+- **CRM Automation** — Je CRM aangestuurd in natuurlijke taal: lijsten extraheren, audits, bulk follow-ups.
+  - Stale leads ophalen in één zin
+  - Audit pipeline + kapotte automations
+  - Workflow-bouw stap voor stap begeleid
+  - Compatibel met GHL, HubSpot, Salesforce, Whise
+  → https://aivansoul.github.io/nl/automations/crm-automation/
+
+- **Lead Routing** — Elke lead gaat naar de juiste sales, juiste queue, juiste moment — in minder dan 30 seconden.
+  - Speed-to-lead < 30s
+  - Round-robin gebalanceerd + skills-based
+  - Detectie van frauduleuze leads (Twilio Lookup)
+  - Auto follow-up bij uitblijven antwoord
+  → https://aivansoul.github.io/nl/automations/lead-routing/
+
+- **Onboarding Systems** — Nieuwe klanten worden begeleid zonder dat een mens hun hand moet vasthouden.
+  - Sequentie D+0, D+3, D+7, D+30 gepersonaliseerd
+  - Document-collectie + handtekening geautomatiseerd
+  - Eerste waarde zichtbaar binnen 7 dagen
+  - Google-review op het juiste moment gevraagd
+  → https://aivansoul.github.io/nl/automations/onboarding-systems/
+
+Bekijk alles: https://aivansoul.github.io/nl/automations/
+
+---
+
+### Create — De interfacelaag. Sites en apps AI-ready, ontworpen voor conversie en machine-leesbaarheid.
+
+Details: We bouwen de zichtbare interface van je business — geen brochuresite, maar een platform dat converteert, dat zich laat lezen door AI's, en dat met je stack mee evolueert. Modulaire architectuur, geen complete rebuild bij elke technologische bocht. Static-first, schema overal, fast by default.
+
+- **AI-Ready Websites** — Sites die net zo goed met AI praten als met mensen. llms.txt, schema, markdown mirrors, gestructureerde FAQ.
+  - llms.txt + markdown mirrors per pagina
+  - Volledige JSON-LD (Org, Service, FAQ, Article)
+  - Meertalig met propere hreflang
+  - Core Web Vitals gehaald op mobiel
+  → https://aivansoul.github.io/nl/create/ai-ready-websites/
+
+- **Conversion Systems** — Gemeten, geïnstrumenteerde conversiefunnel, sprint na sprint verbeterd.
+  - A/B test op CTA's en copy
+  - Korte formulieren + Pages Functions
+  - Tracking zonder third-party cookies (privacy first)
+  - Wekelijks conversiedashboard
+  → https://aivansoul.github.io/nl/create/conversion-systems/
+
+Bekijk alles: https://aivansoul.github.io/nl/create/
+
+---
+
+### SEO — De discovery-laag. Om gevonden te worden door Google en geciteerd door ChatGPT, Claude, Perplexity.
+
+Details: Traditionele SEO volstaat niet meer. Je prospects stellen hun vragen aan ChatGPT, Claude, Perplexity. Word je niet geciteerd in hun antwoorden, dan besta je niet voor hen. We bouwen de dubbele laag: Google + AI.
+
+- **GEO Optimization** — Generative Engine Optimization: ervoor zorgen dat AI's je merk bij naam citeren.
+  - Volledige llms.txt + markdown mirrors
+  - Rijk FAQPage- + Service-schema
+  - Q/A geformuleerd voor directe citatie
+  - Maandelijkse monitoring van AI-citaties
+  → https://aivansoul.github.io/nl/seo/geo-optimization/
+
+- **AI Search Optimization** — Optimalisatie voor AI-augmented zoekmachines: Google AI Overviews, Bing Copilot, SearchGPT.
+  - Antwoordpagina's gericht op echte prompts
+  - Gestructureerde data Article + HowTo
+  - Interne linking ontworpen voor retrieval
+  - GSC-audit + meting van AI-impressies
+  → https://aivansoul.github.io/nl/seo/ai-search-optimization/
+
+- **Technische SEO** — Het technische fundament van moderne SEO: Core Web Vitals, schema, architectuur en AI-ready performance.
+  - Core Web Vitals en mobile performance
+  - Schone sitemap, robots, canonicals
+  - JSON-LD en interne linking
+  - URL-architectuur en Cloudflare-deployment
+  → https://aivansoul.github.io/nl/seo/technical-seo/
+
+- **Local SEO** — Lokale pagina's, Google Business Profile, LocalBusiness-schema en meertalige FR/NL regionale zichtbaarheid.
+  - Geoptimaliseerde stadspagina's per locale
+  - Google Business Profile + NAP-consistency
+  - LocalBusiness-schema en lokale FAQ's
+  - Meertalige lokale GEO FR/NL
+  → https://aivansoul.github.io/nl/seo/local-seo/
+
+- **Schema & JSON-LD** — Schone schema.org en JSON-LD voor SEO, GEO en AI Search. De laag die AI's als eerste lezen.
+  - Organization, Service, FAQPage, Article
+  - LocalBusiness en BreadcrumbList
+  - Gevalideerde schema-architectuur
+  - Geautomatiseerde generatie via componenten
+  → https://aivansoul.github.io/nl/seo/schema-markup/
+
+Bekijk alles: https://aivansoul.github.io/nl/seo/
+
+> Prijzen op offerte. Audit van 60 minuten gratis, vrijblijvend. Typische sprints van 2 weken.
+
+## Locaties
+- Rue Antoine de Saint-Exupéry 2, 6041 Charleroi, België
+
+## Werkgebied
+België (Wallonië, Brussel, Vlaanderen), Frankrijk, Luxemburg, Nederland. Remote interventies in heel Europa.
+
+### Prioritair bediende steden
+- Charleroi (6000) — Industriële KMO's, B2B-diensten, vastgoed, automotive, biotech (BioPark, Aéropole). Toegewijde pagina: https://aivansoul.github.io/nl/locations/charleroi/
+- Brussel (1000) — Juridische en fiscale kantoren, EU-consultancy, instellingen, fintech, premium hospitality, vastgoed. Toegewijde pagina: https://aivansoul.github.io/nl/locations/brussels/
+- Luik (4000) — Logistiek, e-commerce, fintech, engineering, gezondheidszorg, professionele opleiding. Toegewijde pagina: https://aivansoul.github.io/nl/locations/liege/
+- Namen (5000) — Boekhoud- en advocatenkantoren, consultancy, openbaar bestuur, toerisme, middelgrote maakbedrijven. Toegewijde pagina: https://aivansoul.github.io/nl/locations/namur/
+- Bergen (7000) — Tech & digitaal, cultuur (Mons 2015), openbare diensten, productie, agrovoeding. Toegewijde pagina: https://aivansoul.github.io/nl/locations/mons/
+- Antwerpen (2000) — Havenlogistiek, handel, diamant, finance, mode, e-commerce, consultancy. Toegewijde pagina: https://aivansoul.github.io/nl/locations/antwerpen/
+- Gent (9000) — Tech & SaaS, biotech, scale-ups, design, e-commerce, premium agrovoeding. Toegewijde pagina: https://aivansoul.github.io/nl/locations/gent/
+- Mechelen (2800) — Logistiek, e-commerce, distributie, familiale KMO's, zakelijke dienstverlening. Toegewijde pagina: https://aivansoul.github.io/nl/locations/mechelen/
+- Knokke (8300) — Prestigevastgoed, premium hotels, kunstgalerijen, sterrenrestaurants, family-office services. Toegewijde pagina: https://aivansoul.github.io/nl/locations/knokke/
+- Oostende (8400) — Toerisme, hospitality, haven en logistiek, offshore-energie, visserij, maritieme diensten. Toegewijde pagina: https://aivansoul.github.io/nl/locations/oostende/
+
+## Contact
+- Email: hello@banana-navy.com
+- Telefoon: +32 71 49 40 11
+- Website: https://aivansoul.github.io/nl/
+- LinkedIn: https://www.linkedin.com/company/banana-navy
+- Uren: maandag–vrijdag, 9u–18u CET
+
+## Kerngegevens
+- Vennootschap: Banana Navy SRL
+- BTW: BE 0745.575.058
+- Opgericht: 2021
+- 5 dienst-categorieën, 13 toegewijde diensten
+- Stack: open-source modellen (Llama, Mistral, Qwen) op EU-infra + Claude/GPT waar benchmarks dit rechtvaardigen
+- Representatieve klanten: Belfius, NMBS, ORES, PharmaLys, Immo-Vision, jachetevotreauto.be
+- Operationele talen: Frans, Nederlands, Engels
+
+## Wat ons onderscheidt
+We leveren geen POC, we leveren een modulair systeem dat mee evolueert met AI — nieuwe modellen, nieuwe tools, nieuwe use cases. Architectuur vanaf het begin ontworpen om complete rebuild te vermijden wanneer de tech beweegt. We documenteren elke guardrail. We kiezen waar mogelijk open-source modellen. We tonen je waar je data passeert, prompt per prompt.
+
+## Markdown Mirrors
+Elke pagina van deze site heeft een propere Markdown-mirror — voeg `/index.md` toe aan eender welke URL voor de inhoud zonder navigatie, scripts of chrome:
+
+- https://aivansoul.github.io/nl/index.md
+- https://aivansoul.github.io/nl/agentic-systems/index.md
+- https://aivansoul.github.io/nl/agentic-systems/multi-agent-workflows/index.md
+- https://aivansoul.github.io/nl/agentic-systems/ai-orchestration/index.md
+- https://aivansoul.github.io/nl/agentic-systems/autonomous-operations/index.md
+- https://aivansoul.github.io/nl/agentic-systems/business-ai-infrastructure/index.md
+- https://aivansoul.github.io/nl/voice-agents/index.md
+- https://aivansoul.github.io/nl/voice-agents/ai-receptionist/index.md
+- https://aivansoul.github.io/nl/voice-agents/ai-sales-agent/index.md
+- https://aivansoul.github.io/nl/voice-agents/ai-support-agent/index.md
+- https://aivansoul.github.io/nl/automations/index.md
+- https://aivansoul.github.io/nl/automations/crm-automation/index.md
+- https://aivansoul.github.io/nl/automations/lead-routing/index.md
+- https://aivansoul.github.io/nl/automations/onboarding-systems/index.md
+- https://aivansoul.github.io/nl/create/index.md
+- https://aivansoul.github.io/nl/create/ai-ready-websites/index.md
+- https://aivansoul.github.io/nl/create/conversion-systems/index.md
+- https://aivansoul.github.io/nl/seo/index.md
+- https://aivansoul.github.io/nl/seo/geo-optimization/index.md
+- https://aivansoul.github.io/nl/seo/ai-search-optimization/index.md
+- https://aivansoul.github.io/nl/seo/technical-seo/index.md
+- https://aivansoul.github.io/nl/seo/local-seo/index.md
+- https://aivansoul.github.io/nl/seo/schema-markup/index.md
+- https://aivansoul.github.io/nl/locations/index.md
+- https://aivansoul.github.io/nl/locations/charleroi/index.md
+- https://aivansoul.github.io/nl/locations/brussels/index.md
+- https://aivansoul.github.io/nl/locations/liege/index.md
+- https://aivansoul.github.io/nl/locations/namur/index.md
+- https://aivansoul.github.io/nl/locations/mons/index.md
+- https://aivansoul.github.io/nl/locations/antwerpen/index.md
+- https://aivansoul.github.io/nl/locations/gent/index.md
+- https://aivansoul.github.io/nl/locations/mechelen/index.md
+- https://aivansoul.github.io/nl/locations/knokke/index.md
+- https://aivansoul.github.io/nl/locations/oostende/index.md
+- https://aivansoul.github.io/nl/realisations/index.md
+- https://aivansoul.github.io/nl/realisations/immopolis/index.md
+- https://aivansoul.github.io/nl/approche/index.md
+- https://aivansoul.github.io/nl/lab/index.md
+- https://aivansoul.github.io/nl/equipe/index.md
+- https://aivansoul.github.io/nl/contact/index.md
+- https://aivansoul.github.io/nl/faq/index.md
+- https://aivansoul.github.io/nl/mentions-legales/index.md
+- https://aivansoul.github.io/nl/politique-confidentialite/index.md
+- https://aivansoul.github.io/nl/cgv/index.md
+
+## Veelgestelde vragen
+
+### 1. Wat kost een AI voice agent?
+Onze AI voice agents starten vanaf € 3.000 voor een functioneel starter-systeem dat oproepen kan beantwoorden, leads kan kwalificeren, afspraken kan inplannen en basis-workflows kan afhandelen. De prijs schaalt vervolgens op afhankelijk van integraties, meertalige ondersteuning, CRM-koppelingen, geavanceerde automatisering en custom agent-systemen.
+
+### 2. Hoe lang duurt het om een AI voice agent te bouwen?
+We starten met een audit + strategie-sessie van 60 minuten om je workflows en communicatiebehoeften in kaart te brengen. Een functionele starter-agent wordt typisch binnen één week uitgerold. Geavanceerdere systemen — integraties, automatiseringen, multi-agent infrastructuur — vragen extra implementatietijd afhankelijk van complexiteit.
+
+### 3. Bedien je bedrijven over heel België?
+Ja. Banana Navy bedient bedrijven in zowel Wallonië als Vlaanderen. We werken in het Frans, Nederlands en Engels — wat ons toelaat meertalige AI-systemen en voice agents te ontwerpen die aangepast zijn aan elke markt en klantenbasis.
+
+### 4. Kunnen jullie AI voice agents meerdere talen spreken?
+Ja. We bouwen meertalige voice agents die werken in het Frans, Nederlands en Engels. Afhankelijk van de implementatie kunnen agents de taal automatisch detecteren of tijdens een gesprek wisselen voor een natuurlijkere klantbeleving.
+
+### 5. Kunnen jullie AI-agents integreren met onze bestaande tools en CRM?
+Ja. Onze systemen integreren met CRM's, kalenders, websites, formulieren, telefoonsystemen, API's en interne workflows. We koppelen AI-agents regelmatig aan platformen zoals GoHighLevel, HubSpot, Google Workspace en custom bedrijfstools.
+
+### 6. Gaan AI voice agents mijn team vervangen?
+Nee. Onze systemen zijn ontworpen om je team te ondersteunen en te versterken door repetitieve taken op het vlak van communicatie, kwalificatie, planning en follow-up over te nemen. Zo maakt je team tijd vrij voor gesprekken met hogere waarde, klantrelaties en operations.
+
+### 7. Wat onderscheidt Banana Navy van een klassiek digitaal bureau?
+Banana Navy is gebouwd rond agent-systemen in plaats van geïsoleerde diensten. We combineren AI voice agents, automatiseringsworkflows, SEO/GEO-infrastructuur en intelligente digitale ervaringen tot verbonden systemen die bedrijven helpen om communicatie te automatiseren, leads te kwalificeren, afspraken te boeken en 24/7 te schalen.
+
+### 8. Hoe vermijd je hallucinaties bij een AI-agent in productie?
+Drie hefbomen: 1) RAG met geafbakende bronnen (nooit het ruwe model op je data) 2) Declaratieve guardrails (weigeren, escaleren, loggen) 3) Geautomatiseerde CI-evaluaties bij elke deploy. Elke guardrail is gedocumenteerd.
+
+### 9. Werkt Banana Navy met open-source modellen?
+Ja, standaard wanneer technisch haalbaar — Llama, Mistral, Qwen op EU-infra. Propriëtaire modellen (Claude, GPT) gebruiken we wanneer benchmarks het rechtvaardigen en soevereiniteit geen issue is.
+
+### 10. Hoe vermijd je dat een AI-systeem na 12 maanden obsoleet is?
+Modulaire architectuur vanaf de conceptie. Modellen, vector stores, agents, guardrails — elke laag is een uitwisselbare module. Komt er een beter model uit of een nieuwe tool? Dan wisselen we de betrokken module. Geen volledige rebuild, geen herinvestering vanaf nul.
+
+---
+Bijgewerkt: 2026-06-16
